@@ -45,6 +45,10 @@ fun NavController.navigateToDressUp(colleagueId: Long) {
     navigate(DressUp(colleagueId))
 }
 
+fun NavController.navigateToDressUp(dressUp: DressUp) {
+    navigate(dressUp)
+}
+
 fun NavController.navigateToPostUpload(postUpload: PostUpload) {
     navigate(postUpload)
 }

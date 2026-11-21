@@ -40,7 +40,7 @@ data object ColleagueSelect : Route
  * 2.2 옷 입히기
  *
  * 2.1에서 고른 동료 정보로 앱 바 이름과 캐릭터 머리를 만듦.
- * 2.1이 아직 colleagueId만 넘겨서 나머지는 기본값
+ * 게시물 상세처럼 colleagueId만 아는 곳에서는 나머지가 기본값
  */
 @Serializable
 data class DressUp(

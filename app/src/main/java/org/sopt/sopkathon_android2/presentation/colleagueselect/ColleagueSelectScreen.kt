@@ -40,7 +40,7 @@ import org.sopt.sopkathon_android2.presentation.colleagueselect.model.ColleagueU
 // 2.1 동료 선택
 @Composable
 fun ColleagueSelectRoute(
-    onNextClick: (Long) -> Unit,
+    onNextClick: (ColleagueUiModel) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ColleagueSelectViewModel = viewModel(),
 ) {
@@ -71,7 +71,7 @@ private fun ColleagueSelectScreen(
     onPositionClick: (String) -> Unit,
     onColleagueClick: (Long) -> Unit,
     onLoadMore: () -> Unit,
-    onNextClick: (Long) -> Unit,
+    onNextClick: (ColleagueUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
@@ -162,7 +162,7 @@ private fun ColleagueSelectScreen(
                     "꾸밀 동료를 선택해 주세요"
                 },
                 isEnabled = selectedColleague != null,
-                onClick = { selectedColleague?.let { onNextClick(it.id) } },
+                onClick = { selectedColleague?.let(onNextClick) },
             )
         }
     }

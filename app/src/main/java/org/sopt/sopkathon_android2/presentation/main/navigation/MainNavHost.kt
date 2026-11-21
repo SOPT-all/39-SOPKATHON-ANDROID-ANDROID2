@@ -111,7 +111,16 @@ fun MainNavHost(
         // 2.1 → 2.2 (05)
         composable<ColleagueSelect> {
             ColleagueSelectRoute(
-                onNextClick = navController::navigateToDressUp,
+                onNextClick = { colleague ->
+                    navController.navigateToDressUp(
+                        DressUp(
+                            colleagueId = colleague.id,
+                            name = colleague.name,
+                            position = colleague.position,
+                            profileImageUrl = colleague.profileImageUrl.ifBlank { null },
+                        ),
+                    )
+                },
                 modifier = screenModifier,
             )
         }
