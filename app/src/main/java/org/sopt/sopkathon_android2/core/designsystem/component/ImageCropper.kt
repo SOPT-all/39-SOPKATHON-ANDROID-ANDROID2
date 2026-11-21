@@ -50,7 +50,6 @@ import kotlin.math.roundToInt
 private const val MAX_ZOOM = 15f
 private const val MAX_DECODE_SIZE = 4096
 private const val MAX_OUTPUT_SIZE = 2048
-private const val JPEG_QUALITY = 90
 private val CropAreaPadding = 16.dp
 private val OverlayColor = Color.Black.copy(alpha = 0.8f)
 
@@ -67,7 +66,9 @@ class ImageCropperState internal constructor(private val cacheDirectory: File) {
         get() = geometry != null
 
     /**
-     * 박스 영역을 잘라 캐시에 JPEG로 저장하는 함수
+     * 박스 영역을 잘라 캐시에 PNG로 저장하는 함수
+     *
+     * 누끼 이미지를 잘라도 투명 배경이 남도록 PNG
      *
      * @param maxOutputSize 자른 이미지 긴 변 최대 px
      */
@@ -78,10 +79,10 @@ class ImageCropperState internal constructor(private val cacheDirectory: File) {
         return suspendRunCatching {
             withContext(Dispatchers.IO) {
                 val cropped = source.cropped(current, maxOutputSize)
-                val file = File(cacheDirectory, "cropped${System.currentTimeMillis()}.jpg")
+                val file = File(cacheDirectory, "cropped${System.currentTimeMillis()}.png")
                 try {
                     file.outputStream().use { output ->
-                        check(cropped.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, output)) { "Image crop failed" }
+                        check(cropped.compress(Bitmap.CompressFormat.PNG, 100, output)) { "Image crop failed" }
                     }
                 } finally {
                     cropped.recycle()
