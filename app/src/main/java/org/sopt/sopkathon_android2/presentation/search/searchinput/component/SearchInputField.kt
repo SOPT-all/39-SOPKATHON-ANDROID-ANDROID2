@@ -13,9 +13,12 @@ import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
@@ -29,6 +32,8 @@ import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 @Composable
 fun SearchInputField(
     state: TextFieldState,
+    onSearch: () -> Unit,
+    focusRequester: FocusRequester,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -54,7 +59,8 @@ fun SearchInputField(
             placeholderColor = SopkathonTheme.colors.coolGray500,
             placeholderStyle = SopkathonTheme.typography.body,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            modifier = Modifier.weight(1f),
+            onKeyboardAction = { onSearch() },
+            modifier = Modifier.weight(1f).focusRequester(focusRequester),
         )
         if (state.text.isNotEmpty()) {
             Icon(
@@ -73,6 +79,11 @@ fun SearchInputField(
 @Composable
 private fun SearchInputFieldPreview() {
     SopkathonTheme {
-        SearchInputField(state = rememberTextFieldState("박정"), modifier = Modifier.padding(16.dp))
+        SearchInputField(
+            state = rememberTextFieldState("박정"),
+            onSearch = {},
+            focusRequester = remember { FocusRequester() },
+            modifier = Modifier.padding(16.dp),
+        )
     }
 }

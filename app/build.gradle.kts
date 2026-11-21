@@ -11,6 +11,10 @@ val localProperties = Properties().apply {
     if (file.exists()) file.inputStream().use { load(it) }
 }
 
+val feedUserId = providers.gradleProperty("feed.userId").orNull
+    ?: localProperties.getProperty("feed.userId")
+val configuredFeedUserId = feedUserId?.toLongOrNull()?.takeIf { it > 0 } ?: 0L
+
 android {
     namespace = "org.sopt.sopkathon_android2"
     compileSdk {
@@ -27,6 +31,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("long", "FEED_USER_ID", "${configuredFeedUserId}L")
 
         buildConfigField("String", "BASE_URL", "\"${localProperties.getProperty("base.url", "")}\"")
     }

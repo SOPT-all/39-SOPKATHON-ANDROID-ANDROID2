@@ -37,6 +37,7 @@ fun PopularPostCard(
     likeCount: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    thumbnail: @Composable (() -> Unit)? = null,
 ) {
     Column(
         modifier = modifier.noRippleClickable(onClick = onClick),
@@ -50,12 +51,16 @@ fun PopularPostCard(
                 .clip(RoundedCornerShape(8.dp))
                 .background(SopkathonTheme.colors.coolGray50),
         ) {
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
-            )
+            if (imageUrl.isBlank()) {
+                thumbnail?.invoke()
+            } else {
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
             Row(
                 modifier = Modifier
                     .align(Alignment.BottomStart)

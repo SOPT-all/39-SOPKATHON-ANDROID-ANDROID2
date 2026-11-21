@@ -91,7 +91,6 @@ fun MainNavHost(
             )
         }
 
-        // 6.1 → 4
         composable<SearchInput> {
             SearchInputRoute(
                 navigateUp = navController::navigateUp,
