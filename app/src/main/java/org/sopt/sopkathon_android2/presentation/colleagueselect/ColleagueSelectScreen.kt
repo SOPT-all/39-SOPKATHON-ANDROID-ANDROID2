@@ -14,6 +14,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 
+// 2.1 동료 선택
 @Composable
 fun ColleagueSelectRoute(
     onNextClick: (Long) -> Unit,

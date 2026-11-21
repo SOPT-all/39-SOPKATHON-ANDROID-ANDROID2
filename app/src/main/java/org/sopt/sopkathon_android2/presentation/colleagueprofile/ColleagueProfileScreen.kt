@@ -14,6 +14,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 
+// 4 동료 프로필
 @Composable
 fun ColleagueProfileRoute(
     userId: Long,

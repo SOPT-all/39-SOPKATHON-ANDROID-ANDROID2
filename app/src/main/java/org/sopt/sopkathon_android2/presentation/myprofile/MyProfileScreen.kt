@@ -13,6 +13,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 
+// 3 내 프로필
 @Composable
 fun MyProfileRoute(
     modifier: Modifier = Modifier,

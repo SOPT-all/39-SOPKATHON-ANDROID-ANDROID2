@@ -14,6 +14,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 
+// 6 검색
 @Composable
 fun SearchRoute(
     onColleagueClick: (Long) -> Unit,
