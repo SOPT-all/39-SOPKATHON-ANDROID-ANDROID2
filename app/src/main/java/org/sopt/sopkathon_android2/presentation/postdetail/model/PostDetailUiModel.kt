@@ -3,6 +3,7 @@ package org.sopt.sopkathon_android2.presentation.postdetail.model
 import org.sopt.sopkathon_android2.core.designsystem.component.post.OutfitItemType
 import org.sopt.sopkathon_android2.data.dto.response.CommentResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.FeedPostResponseDto
+import org.sopt.sopkathon_android2.data.dto.response.OutfitItemResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.PostDetailResponseDto
 import org.sopt.sopkathon_android2.presentation.feed.model.FeedPostUiModel
 import org.sopt.sopkathon_android2.presentation.feed.model.toUiModel
@@ -44,9 +45,38 @@ fun PostDetailResponseDto.toUiModel() = PostDetailUiModel(
         likeCount, liked, commentCount, createdAt,
     ).toUiModel(),
     targetUserId = targetUser.userId,
-    items = DummyPostOutfitItems.items,
+    items = outfitItems.distinctBy { it.clothesId }.map { it.toUiModel() },
     purchaseUrls = purchaseLinks.mapNotNull { it.url.toWebUrlOrNull() }.distinct(),
 )
+
+// 서버 API에 브랜드, 가격이 없어 고정 값
+private const val OUTFIT_ITEM_BRAND = "UNIQLO"
+
+private fun OutfitItemResponseDto.toUiModel(): OutfitItemUiModel {
+    val type = when (category.trim().uppercase(Locale.ROOT)) {
+        "TOP" -> OutfitItemType.TOP
+        "BOTTOM" -> OutfitItemType.BOTTOM
+        else -> null
+    }
+    return OutfitItemUiModel(
+        clothesId = clothesId,
+        name = name,
+        category = when (type) {
+            OutfitItemType.TOP -> "상의"
+            OutfitItemType.BOTTOM -> "하의"
+            null -> category
+        },
+        imageUrl = imageUrl.orEmpty(),
+        purchaseUrl = purchaseUrl.toWebUrlOrNull(),
+        type = type,
+        brand = OUTFIT_ITEM_BRAND,
+        priceLabel = when (type) {
+            OutfitItemType.TOP -> "49,900원"
+            OutfitItemType.BOTTOM -> "39,900원"
+            null -> ""
+        },
+    )
+}
 
 fun CommentResponseDto.toUiModel() = CommentUiModel(
     commentId, author.userId, author.name.trim(), author.position.trim(), content, createdAt.normalizePostTimestamp(),

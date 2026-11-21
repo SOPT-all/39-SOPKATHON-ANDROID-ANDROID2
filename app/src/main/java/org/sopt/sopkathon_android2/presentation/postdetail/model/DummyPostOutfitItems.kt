@@ -2,7 +2,7 @@ package org.sopt.sopkathon_android2.presentation.postdetail.model
 
 import org.sopt.sopkathon_android2.core.designsystem.component.post.OutfitItemType
 
-// 서버 상품 데이터 대신 상세 화면에 표시할 해커톤용 고정 상품
+// 프리뷰에 쓰는 해커톤용 고정 상품
 internal object DummyPostOutfitItems {
     val items = listOf(
         OutfitItemUiModel(
