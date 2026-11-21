@@ -107,15 +107,26 @@ fun rememberStickerCanvasState(): StickerCanvasState {
  * 안에서 [Sticker]로 붙인 것만 탭하면 선택, 선택한 것만 드래그로 이동하고 오른쪽 아래 핸들로 크기 조절.
  * 캔버스 빈 곳을 탭하면 선택 해제. 먼저 부른 것이 아래에 깔림
  *
+ * 스티커 이미지는 원본 크기로 불러옴. Coil은 처음 크기로만 불러와서 키우면 흐려짐
+ *
  * ```
  * val stickerState = rememberStickerCanvasState()
+ * val context = LocalContext.current
  * StickerCanvas(state = stickerState, modifier = Modifier.size(190.dp, 500.dp)) {
  *     Sticker(key = "bottom", size = DpSize(105.dp, 228.dp), initialPosition = DpOffset(43.dp, 272.dp)) {
- *         AsyncImage(model = bottomUri, contentDescription = null, modifier = Modifier.fillMaxSize())
+ *         AsyncImage(
+ *             model = ImageRequest.Builder(context).data(bottomUri).size(Size.ORIGINAL).build(),
+ *             contentDescription = null,
+ *             modifier = Modifier.fillMaxSize(),
+ *         )
  *     }
  *     AsyncImage(model = faceUri, contentDescription = null, modifier = Modifier.align(Alignment.TopCenter))
  *     Sticker(key = "top", size = DpSize(190.dp, 213.dp), initialPosition = DpOffset(0.dp, 102.dp)) {
- *         AsyncImage(model = topUri, contentDescription = null, modifier = Modifier.fillMaxSize())
+ *         AsyncImage(
+ *             model = ImageRequest.Builder(context).data(topUri).size(Size.ORIGINAL).build(),
+ *             contentDescription = null,
+ *             modifier = Modifier.fillMaxSize(),
+ *         )
  *     }
  * }
  * ```

@@ -112,6 +112,8 @@ The server gives a presigned URL, and the app uploads the image to it directly.
 
 `upload` resizes the image and saves it as JPEG before uploading. `uploadPng` uploads the file as it is, so the transparent background stays.
 
+`ImageCropperState.crop()` and `StickerCanvasState.capture()` save a new file in the cache each time. Delete it after the upload succeeds: `uri.toFile().delete()`.
+
 ```kotlin
 // XxxRoute
 val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
