@@ -2,6 +2,7 @@ package org.sopt.sopkathon_android2.core.designsystem.theme
 
 import androidx.activity.compose.LocalActivity
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
@@ -45,6 +46,12 @@ fun SopkathonTheme(
         LocalSopkathonColors provides defaultSopkathonColors,
         LocalSopkathonTypography provides defaultSopkathonTypography,
     ) {
-        MaterialTheme(content = content)
+        MaterialTheme(
+            colorScheme = lightColorScheme(
+                background = defaultSopkathonColors.white,
+                surface = defaultSopkathonColors.white,
+            ),
+            content = content,
+        )
     }
 }
