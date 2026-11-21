@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 안드로이드 12부터는 시스템 스플래시가 떠서 아이콘과 배경만 지정 -->
+    <style name="Theme.SOPKATHON_ANDROID2.Splash">
+        <item name="android:windowSplashScreenBackground">@color/white</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/img_splash_icon</item>
+    </style>
+</resources>

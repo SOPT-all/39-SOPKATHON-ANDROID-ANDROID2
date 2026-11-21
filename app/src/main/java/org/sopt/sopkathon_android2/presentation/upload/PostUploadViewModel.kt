@@ -1,12 +1,13 @@
 package org.sopt.sopkathon_android2.presentation.upload
 
+import android.app.Application
 import android.content.ContentResolver
 import android.util.Log
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.snapshotFlow
 import androidx.core.net.toFile
 import androidx.core.net.toUri
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -19,11 +20,13 @@ import kotlinx.coroutines.launch
 import org.sopt.sopkathon_android2.core.common.util.suspendRunCatching
 import org.sopt.sopkathon_android2.data.di.ServiceModule
 import org.sopt.sopkathon_android2.data.dto.request.PostCreateRequestDto
+import org.sopt.sopkathon_android2.data.local.UserPreferences
 import org.sopt.sopkathon_android2.presentation.main.navigation.PostUpload
 import org.sopt.sopkathon_android2.presentation.upload.model.PostUploadItemUiModel
 import org.sopt.sopkathon_android2.presentation.upload.model.PostVisibility
 
-class PostUploadViewModel : ViewModel() {
+// 저장된 userId를 읽느라 AndroidViewModel
+class PostUploadViewModel(application: Application) : AndroidViewModel(application) {
     val titleState = TextFieldState()
     val descriptionState = TextFieldState()
 
@@ -68,13 +71,14 @@ class PostUploadViewModel : ViewModel() {
     fun onPostClick() {
         val state = _uiState.value
         if (!state.isPostEnabled) return // 연타 시 중복 게시 방지
+        val authorId = UserPreferences(getApplication()).userId ?: return
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
             suspendRunCatching {
                 ServiceModule.apiService.postPost(
-                    userId = AUTHOR_ID,
+                    userId = authorId,
                     request = PostCreateRequestDto(
                         title = titleState.text.toString().trim(),
                         imageKey = state.imageKey,
@@ -98,10 +102,5 @@ class PostUploadViewModel : ViewModel() {
     override fun onCleared() {
         val imageUri = _uiState.value.imageUri.toUri()
         if (imageUri.scheme == ContentResolver.SCHEME_FILE) imageUri.toFile().delete()
-    }
-
-    companion object {
-        // 서버에 1번 사용자가 없어 피드 조회와 같은 백엔드 테스트 사용자로 둔 임시 값
-        private const val AUTHOR_ID = 3L
     }
 }

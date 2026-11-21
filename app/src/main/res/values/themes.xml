@@ -2,4 +2,9 @@
 <resources>
 
     <style name="Theme.SOPKATHON_ANDROID2" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- 앱 시작 직후 앱 아이콘 스플래시, 화면이 뜨면 MainActivity에서 배경을 흰색으로 교체 -->
+    <style name="Theme.SOPKATHON_ANDROID2.Splash">
+        <item name="android:windowBackground">@drawable/bg_splash</item>
+    </style>
 </resources>

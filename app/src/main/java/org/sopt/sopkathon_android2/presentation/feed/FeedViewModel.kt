@@ -7,12 +7,19 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.sopt.sopkathon_android2.core.common.util.suspendRunCatching
+import org.sopt.sopkathon_android2.data.di.ServiceModule
+import org.sopt.sopkathon_android2.data.dto.response.CursorResponseDto
+import org.sopt.sopkathon_android2.data.dto.response.FeedPostResponseDto
+import org.sopt.sopkathon_android2.data.service.ApiService
 import org.sopt.sopkathon_android2.data.service.FeedApiService
 import org.sopt.sopkathon_android2.data.di.FeedServiceModule
 import org.sopt.sopkathon_android2.presentation.feed.component.FeedScope
@@ -21,6 +28,7 @@ import org.sopt.sopkathon_android2.presentation.feed.model.PostLikeUpdates
 
 class FeedViewModel(
     private val apiService: FeedApiService = FeedServiceModule.apiService,
+    private val userApiService: ApiService = ServiceModule.apiService,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(FeedUiState())
     val uiState = _uiState.asStateFlow()
@@ -33,6 +41,9 @@ class FeedViewModel(
     val uiEffect = _uiEffect.receiveAsFlow()
     private val likeJobs = mutableMapOf<Pair<Long, Long>, Job>()
     private val likeStates = mutableMapOf<Pair<Long, Long>, Pair<Boolean, Int>>()
+
+    // 피드 응답에 부서가 없어 사용자 조회로 채운 userId별 부서
+    private val departments = mutableMapOf<Long, String>()
 
     init {
         viewModelScope.launch {
@@ -87,16 +98,11 @@ class FeedViewModel(
         pageJob = viewModelScope.launch {
             suspendRunCatching {
                 likeJobs.filterKeys { it.first == currentUserId }.values.toList().joinAll()
-                val popular = state.selectedScope == FeedScope.POPULAR
-                val response = apiService.getFeed(
+                getFeedPage(
                     userId = currentUserId,
-                    sort = if (popular) "POPULAR" else "LATEST",
-                    period = if (popular) "WEEK" else null,
+                    scope = state.selectedScope,
                     cursor = if (isRefresh) null else state.nextCursor,
-                    limit = 20,
                 )
-                check(response.status in 200..299) { response.code }
-                requireNotNull(response.data)
             }.onSuccess { page ->
                 if (requestGeneration != generation) return@onSuccess
                 val posts = page.items.map { dto ->
@@ -125,6 +131,49 @@ class FeedViewModel(
             }
         }
     }
+
+    private suspend fun getFeedPage(
+        userId: Long,
+        scope: FeedScope,
+        cursor: String?,
+    ): CursorResponseDto<FeedPostResponseDto> {
+        val popular = scope == FeedScope.POPULAR
+        var nextCursor = cursor
+        var page: CursorResponseDto<FeedPostResponseDto>
+        val items = mutableListOf<FeedPostResponseDto>()
+        var requestCount = 0
+        do {
+            val response = apiService.getFeed(
+                userId = userId,
+                sort = if (popular) "POPULAR" else "LATEST",
+                period = if (popular) "WEEK" else null,
+                cursor = nextCursor,
+                limit = 20,
+            )
+            check(response.status in 200..299) { response.code }
+            page = requireNotNull(response.data)
+            items += if (scope == FeedScope.DEPARTMENT) page.items.filterSameDepartment(userId) else page.items
+            val isCursorMoved = page.nextCursor != null && page.nextCursor != nextCursor
+            nextCursor = page.nextCursor
+            requestCount++
+            // 우리 부서 글이 한 페이지에 없을 때 빈 목록으로 끝나지 않게 몇 페이지 더 확인
+        } while (items.isEmpty() && page.hasMore && isCursorMoved && requestCount < MAX_DEPARTMENT_PAGE_REQUESTS)
+        return page.copy(items = items)
+    }
+
+    private suspend fun List<FeedPostResponseDto>.filterSameDepartment(userId: Long): List<FeedPostResponseDto> {
+        val myDepartment = departmentOf(userId)
+        val authorDepartments = coroutineScope {
+            map { it.author.userId }.distinct()
+                .map { authorId -> async { authorId to departmentOf(authorId) } }
+                .awaitAll()
+                .toMap()
+        }
+        return filter { authorDepartments[it.author.userId] == myDepartment }
+    }
+
+    private suspend fun departmentOf(userId: Long): String = departments[userId]
+        ?: requireNotNull(userApiService.getUser(userId).data).department.also { departments[userId] = it }
 
     fun toggleLike(postId: Long) {
         val currentUserId = userId?.takeIf { it > 0 } ?: return
@@ -175,5 +224,9 @@ class FeedViewModel(
                 },
             )
         }
+    }
+
+    private companion object {
+        const val MAX_DEPARTMENT_PAGE_REQUESTS = 5
     }
 }

@@ -34,7 +34,6 @@ import org.sopt.sopkathon_android2.presentation.consent.component.ConsentInfoIte
 @Composable
 fun ConsentRoute(
     onAgreeClick: () -> Unit,
-    onSkipClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ConsentViewModel = viewModel(),
 ) {
@@ -46,7 +45,6 @@ fun ConsentRoute(
         // 약관 바텀시트 나오면 연결
         onDetailClick = {},
         onAgreeClick = onAgreeClick,
-        onSkipClick = onSkipClick,
         modifier = modifier,
     )
 }
@@ -57,7 +55,6 @@ private fun ConsentScreen(
     onCheckClick: () -> Unit,
     onDetailClick: () -> Unit,
     onAgreeClick: () -> Unit,
-    onSkipClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -164,12 +161,6 @@ private fun ConsentScreen(
                 isEnabled = uiState.isConsentChecked,
                 onClick = onAgreeClick,
             )
-
-            Spacer(modifier = Modifier.height(2.dp))
-
-            ConsentSkipButton(
-                onClick = onSkipClick,
-            )
         }
     }
 }
@@ -197,26 +188,6 @@ private fun ConsentStartButton(
     }
 }
 
-@Composable
-private fun ConsentSkipButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(40.dp)
-            .noRippleClickable(onClick = onClick),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = "동의하지 않고 둘러보기",
-            style = SopkathonTheme.typography.button,
-            color = SopkathonTheme.colors.coolGray500,
-        )
-    }
-}
-
 @ScreenPreview
 @Composable
 private fun ConsentScreenPreview() {
@@ -226,7 +197,6 @@ private fun ConsentScreenPreview() {
             onCheckClick = {},
             onDetailClick = {},
             onAgreeClick = {},
-            onSkipClick = {},
         )
     }
 }
@@ -240,7 +210,6 @@ private fun ConsentScreenCheckedPreview() {
             onCheckClick = {},
             onDetailClick = {},
             onAgreeClick = {},
-            onSkipClick = {},
         )
     }
 }

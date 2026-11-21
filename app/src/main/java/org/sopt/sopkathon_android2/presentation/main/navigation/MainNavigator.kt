@@ -3,19 +3,15 @@ package org.sopt.sopkathon_android2.presentation.main.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-
-// 온보딩(동의·프로필 생성)을 백스택에서 지우고 피드로
-fun NavController.navigateToFeedFromOnboarding() {
-    navigate(Feed) {
-        popUpTo<Consent> { inclusive = true }
-    }
-}
+import org.sopt.sopkathon_android2.core.navigation.Route
+import org.sopt.sopkathon_android2.data.local.UserPreferences
 
 // 온보딩(동의·프로필 생성)을 백스택에서 지우고 가입 완료로
 fun NavController.navigateToSignUpComplete(signUpComplete: SignUpComplete) {
@@ -75,8 +71,8 @@ fun NavController.navigateToPostDetail(postId: Long) {
 
 class MainNavigator(
     val navController: NavHostController,
+    val startDestination: Route,
 ) {
-    val startDestination = Consent
 
     @Composable
     fun currentDestination(): NavDestination? {
@@ -111,6 +107,11 @@ class MainNavigator(
 @Composable
 fun rememberMainNavigator(
     navController: NavHostController = rememberNavController(),
-): MainNavigator = remember(navController) {
-    MainNavigator(navController)
+): MainNavigator {
+    val context = LocalContext.current
+    return remember(navController) {
+        // 프로필을 만든 적 있으면 온보딩 없이 바로 피드로 자동 로그인
+        val startDestination = if (UserPreferences(context).userId != null) Feed else Consent
+        MainNavigator(navController, startDestination)
+    }
 }

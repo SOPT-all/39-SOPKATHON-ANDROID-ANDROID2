@@ -45,11 +45,10 @@ fun MainNavHost(
             .fillMaxSize()
             .consumeWindowInsets(paddingValues), // 키보드 올라올 때 하단 패딩 소비
     ) {
-        // 0.2 → 0.3 (01), 미동의 시 피드 둘러보기 (B1)
+        // 0.2 → 0.3 (01)
         composable<Consent> {
             ConsentRoute(
                 onAgreeClick = navController::navigateToProfileCreate,
-                onSkipClick = navController::navigateToFeedFromOnboarding,
                 modifier = screenModifier,
             )
         }

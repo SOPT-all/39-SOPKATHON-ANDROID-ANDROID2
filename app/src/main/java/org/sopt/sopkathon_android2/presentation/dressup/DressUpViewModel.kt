@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.sopt.sopkathon_android2.core.common.util.suspendRunCatching
+import org.sopt.sopkathon_android2.data.di.ServiceModule
 import org.sopt.sopkathon_android2.presentation.dressup.component.character.CharacterHeadMaker
 import org.sopt.sopkathon_android2.presentation.dressup.component.wardrobe.model.WardrobeClothes
 import org.sopt.sopkathon_android2.presentation.dressup.model.ClothesCategory
@@ -36,9 +37,32 @@ class DressUpViewModel(application: Application) : AndroidViewModel(application)
     val uiEffect: Flow<DressUpUiEffect> = _uiEffect.receiveAsFlow()
 
     fun setColleague(dressUp: DressUp) {
+        // 화면이 다시 만들어질 때 중복 조회 방지
+        if (::colleague.isInitialized && colleague.colleagueId == dressUp.colleagueId) return
         colleague = dressUp
+        showColleague(dressUp)
+        // 게시물 상세처럼 id만 넘어오면 이름, 사진을 서버에서 조회
+        if (dressUp.name.isBlank() || dressUp.profileImageUrl == null) getColleagueProfile(dressUp.colleagueId)
+    }
+
+    private fun showColleague(dressUp: DressUp) {
         _uiState.update { it.copy(colleagueName = "${dressUp.name} ${dressUp.position}".trim()) }
         dressUp.profileImageUrl?.let(::makeCharacterHead)
+    }
+
+    private fun getColleagueProfile(colleagueId: Long) {
+        viewModelScope.launch {
+            suspendRunCatching { requireNotNull(ServiceModule.apiService.getUser(colleagueId).data) }
+                .onSuccess { profile ->
+                    colleague = colleague.copy(
+                        name = profile.name,
+                        position = profile.position,
+                        profileImageUrl = profile.profileImageUrl,
+                    )
+                    showColleague(colleague)
+                }
+                .onFailure { Log.e(TAG, "동료 정보 조회 실패", it) }
+        }
     }
 
     private fun makeCharacterHead(profileImageUrl: String) {
