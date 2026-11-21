@@ -17,6 +17,8 @@ import org.sopt.sopkathon_android2.data.di.PostDetailServiceModule
 import org.sopt.sopkathon_android2.data.dto.request.CommentCreateRequestDto
 import org.sopt.sopkathon_android2.data.service.PostDetailApiService
 import org.sopt.sopkathon_android2.presentation.postdetail.model.toUiModel
+import org.sopt.sopkathon_android2.presentation.feed.model.PostLikeUpdate
+import org.sopt.sopkathon_android2.presentation.feed.model.PostLikeUpdates
 
 class PostDetailViewModel(
     private val api: PostDetailApiService = PostDetailServiceModule.apiService,
@@ -42,6 +44,10 @@ class PostDetailViewModel(
         val token = ++generation
         detailJob?.cancel()
         commentsJob?.cancel()
+        if (userId <= 0) {
+            _uiState.value = PostDetailUiState(error = "프로필을 만든 뒤 게시글을 확인해주세요")
+            return
+        }
         _uiState.value = PostDetailUiState(isLoading = true)
         detailJob = viewModelScope.launch {
             suspendRunCatching {
@@ -161,6 +167,7 @@ class PostDetailViewModel(
         val previous = state.detail?.post ?: return
         if (state.isLiking) return
         val token = generation
+        val requestUserId = userId
         _uiState.update {
             it.copy(isLiking = true, detail = it.detail?.copy(post = previous.copy(
                 isLiked = !previous.isLiked,
@@ -174,6 +181,12 @@ class PostDetailViewModel(
                     else api.postPostLike(userId, postId)).requireData()
                     .also { check(it.postId == postId && it.likeCount >= 0) }
             }.onSuccess { result ->
+                PostLikeUpdates.publish(
+                    PostLikeUpdate(
+                        requestUserId, result.postId, result.liked,
+                        result.likeCount.coerceAtMost(Int.MAX_VALUE.toLong()).toInt(),
+                    ),
+                )
                 if (token == generation) _uiState.update {
                     it.copy(isLiking = false, detail = it.detail?.let { detail ->
                         detail.copy(post = detail.post.copy(
