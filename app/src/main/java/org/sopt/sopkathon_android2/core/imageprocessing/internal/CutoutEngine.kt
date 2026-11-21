@@ -40,11 +40,11 @@ internal class CutoutEngine(context: Context) {
         }
     }
 
-    suspend fun process(uri: Uri): Uri {
+    suspend fun process(uri: Uri, mask: suspend (Bitmap, Bitmap) -> Bitmap): Uri {
         var saved: Uri? = null
         try {
             return withContext(Dispatchers.IO) {
-                processLocked(uri).also { saved = it }
+                processLocked(uri, mask).also { saved = it }
             }
         } catch (e: CancellationException) {
             withContext(NonCancellable + Dispatchers.IO) { saved?.let { CutoutFiles(context).delete(it) } }
@@ -52,20 +52,24 @@ internal class CutoutEngine(context: Context) {
         }
     }
 
-    private suspend fun processLocked(uri: Uri): Uri =
+    private suspend fun processLocked(uri: Uri, mask: suspend (Bitmap, Bitmap) -> Bitmap): Uri =
         gate.withLock {
             try {
                 newSegmenter().use { segmenter ->
                     prepare(segmenter)
                     val input = CutoutImageIO.decode(context, uri)
                     var foreground: Bitmap? = null
+                    var output: Bitmap? = null
                     try {
                         currentCoroutineContext().ensureActive()
                         foreground = segmenter.process(InputImage.fromBitmap(input, 0)).awaitSettled().foregroundBitmap
                             ?: throw CutoutException(Reason.NO_FOREGROUND)
                         currentCoroutineContext().ensureActive()
-                        CutoutImageIO.save(context, foreground)
+                        output = mask(input, foreground)
+                        currentCoroutineContext().ensureActive()
+                        CutoutImageIO.save(context, output)
                     } finally {
+                        if (output !== foreground && output !== input) output?.recycle()
                         if (foreground !== input) foreground?.recycle()
                         input.recycle()
                     }
