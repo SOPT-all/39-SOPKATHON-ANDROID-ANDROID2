@@ -9,6 +9,7 @@ import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.*
 import org.junit.Test
+import org.sopt.sopkathon_android2.core.designsystem.component.post.OutfitItemType
 import org.sopt.sopkathon_android2.data.dto.request.CommentCreateRequestDto
 import org.sopt.sopkathon_android2.data.dto.response.PostDetailResponseDto
 import org.sopt.sopkathon_android2.data.service.PostDetailApiService
@@ -19,7 +20,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 
 class PostDetailApiTest {
     @Test
-    fun usesFixedProductsWhileKeepingPostResponse() {
+    fun mapsServerOutfitItems() {
         val dto = Json { ignoreUnknownKeys = true }.decodeFromString<PostDetailResponseDto>("""{
             "postId":501,"author":{"userId":2,"name":"작성자","position":"대리"},
             "targetUser":{"userId":1,"name":"대상자","position":"과장"},
@@ -32,10 +33,13 @@ class PostDetailApiTest {
         val model = dto.toUiModel()
         assertTrue(model.post.isLiked)
         assertEquals("", model.post.content)
-        assertNotNull(model.items.first().type)
+        assertEquals(OutfitItemType.TOP, model.items.first().type)
+        assertEquals("상의", model.items.first().category)
+        assertEquals("https://example.com", model.items.first().purchaseUrl)
         assertEquals("UNIQLO", model.items.first().brand)
-        assertEquals("H&M", model.items.last().brand)
-        assertEquals("39,900원", model.items.last().priceLabel)
+        assertEquals("49,900원", model.items.first().priceLabel)
+        assertNull(model.items.last().type)
+        assertNull(model.items.last().purchaseUrl)
         assertEquals(listOf("https://example.com"), model.purchaseUrls)
         assertNull("https:///missing-host".toWebUrlOrNull())
     }
