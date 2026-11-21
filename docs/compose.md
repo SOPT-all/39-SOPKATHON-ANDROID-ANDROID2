@@ -60,6 +60,7 @@ fun PostCard(
 | Move and resize stickers | `StickerCanvas(rememberStickerCanvasState(), Modifier.size(<character size>)) { Sticker(key, size, initialPosition) { } }`. The canvas is the capture area, so size it to the character and put the background outside it. The sticker content uses `fillMaxSize()`. The first call is drawn at the bottom |
 | Image in a sticker | `AsyncImage(model = ImageRequest.Builder(context).data(uri).size(Size.ORIGINAL).build(), ...)`. Coil loads only at the first size, so an enlarged sticker gets blurry without it |
 | Save the sticker canvas as an image | `stickerState.capture()` from `rememberCoroutineScope()`. It gives a transparent PNG `Uri` in the cache. Upload it with `PresignedUrlUploader.uploadPng`, then delete it |
+| Snackbar (toast) | `MainScreen` provides `LocalSopkathonSnackbarState`. In `XxxRoute`, get `LocalSopkathonSnackbarState.current` and, for a `ShowXxxSnackbar` effect, call `show(SopkathonSnackbarVisuals(message, type, description, actionLabel), onActionClick = { })`. It runs in the `MainScreen` scope, so it stays on screen when you navigate right after (e.g. upload, then feed). The same snackbar is ignored while it is showing or waiting. In `XxxScreen`, put `SopkathonSnackbarHost(Modifier.align(Alignment.TopCenter))` last in the content `Box` below the top app bar. A screen without the host doesn't show it, but it still closes on time |
 
 ## Preview
 
