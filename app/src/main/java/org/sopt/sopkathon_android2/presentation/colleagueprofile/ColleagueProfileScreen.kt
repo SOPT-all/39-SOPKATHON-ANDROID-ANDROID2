@@ -30,6 +30,7 @@ import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 import org.sopt.sopkathon_android2.presentation.colleagueprofile.component.ColleagueProfileAppBar
 import org.sopt.sopkathon_android2.presentation.colleagueprofile.model.ColleagueOutfitUiModel
+import org.sopt.sopkathon_android2.presentation.main.navigation.DressUp
 
 // 4 동료 프로필
 @Composable
@@ -37,7 +38,7 @@ fun ColleagueProfileRoute(
     userId: Long,
     navigateUp: () -> Unit,
     onPostClick: (Long) -> Unit,
-    onCoordiClick: () -> Unit,
+    onCoordiClick: (DressUp) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ColleagueProfileViewModel = viewModel(),
 ) {
@@ -63,7 +64,16 @@ fun ColleagueProfileRoute(
         navigateUp = navigateUp,
         onMoreClick = {},
         onPostClick = onPostClick,
-        onCoordiClick = onCoordiClick,
+        onCoordiClick = {
+            onCoordiClick(
+                DressUp(
+                    colleagueId = userId,
+                    name = uiState.name,
+                    position = uiState.rank,
+                    profileImageUrl = uiState.profileImageUrl.ifBlank { null },
+                ),
+            )
+        },
         modifier = modifier,
     )
 }
