@@ -24,6 +24,8 @@ private val Green600 = Color(0xFF1E9E5A)
 private val Pink50 = Color(0xFFFFEDF2)
 private val Pink400 = Color(0xFFFF5C8A)
 private val Pink500 = Color(0xFFE0457B)
+private val Amber50 = Color(0xFFFFF6E5)
+private val Amber700 = Color(0xFF9A6B00)
 
 @Immutable
 data class SopkathonColors(
@@ -48,6 +50,8 @@ data class SopkathonColors(
     val pink50: Color,
     val pink400: Color,
     val pink500: Color,
+    val amber50: Color,
+    val amber700: Color,
 )
 
 val defaultSopkathonColors = SopkathonColors(
@@ -72,4 +76,6 @@ val defaultSopkathonColors = SopkathonColors(
     pink50 = Pink50,
     pink400 = Pink400,
     pink500 = Pink500,
+    amber50 = Amber50,
+    amber700 = Amber700,
 )

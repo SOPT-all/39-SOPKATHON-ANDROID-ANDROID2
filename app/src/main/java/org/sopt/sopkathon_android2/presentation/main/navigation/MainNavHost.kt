@@ -104,18 +104,17 @@ fun MainNavHost(
             DressUpRoute(
                 colleagueId = dressUp.colleagueId,
                 navigateUp = navController::navigateUp,
-                onCompleteClick = { navController.navigateToPostUpload(dressUp.colleagueId) },
+                onCompleteClick = {}, // 코디 완성 업로드(OutfitUploader) 연결 전이라 이동 없음
                 modifier = screenModifier,
             )
         }
 
         // 2.3 → 1 (07)
         composable<PostUpload> { backStackEntry ->
-            val postUpload = backStackEntry.toRoute<PostUpload>()
             PostUploadRoute(
-                colleagueId = postUpload.colleagueId,
+                postUpload = backStackEntry.toRoute<PostUpload>(),
                 navigateUp = navController::navigateUp,
-                onUploadClick = navController::navigateToFeedAfterUpload,
+                navigateToFeed = navController::navigateToFeedAfterUpload,
                 modifier = screenModifier,
             )
         }

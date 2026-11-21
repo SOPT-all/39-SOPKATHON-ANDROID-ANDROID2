@@ -36,9 +36,26 @@ data object ColleagueSelect : Route
 @Serializable
 data class DressUp(val colleagueId: Long) : Route
 
-// 2.3 게시글 업로드
+/**
+ * 2.3 코디 게시하기
+ *
+ * 2.2 코디 완성 때 올린 결과. `OutfitUploadResult.toPostUpload()`로 만듦
+ * item으로 시작하는 목록은 [clothesIds]와 순서가 같음
+ *
+ * @param imageUri 썸네일로 쓰는 캐릭터 캡처 PNG. 2.3을 나가면 삭제
+ */
 @Serializable
-data class PostUpload(val colleagueId: Long) : Route
+data class PostUpload(
+    val colleagueId: Long,
+    val colleagueName: String,
+    val colleaguePosition: String,
+    val imageKey: String,
+    val imageUri: String,
+    val clothesIds: List<Long>,
+    val itemNames: List<String>,
+    val itemCategoryLabels: List<String>,
+    val itemInfoCompletes: List<Boolean>,
+) : Route
 
 // 3 내 프로필 (하단 탭)
 @Serializable
