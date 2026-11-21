@@ -12,5 +12,5 @@ data class ClothesCreateRequestDto(
     @SerialName("purchaseLink")
     val purchaseLink: String,
     @SerialName("category")
-    val category: String, // TOP, BOTTOM
+    val category: String,
 )

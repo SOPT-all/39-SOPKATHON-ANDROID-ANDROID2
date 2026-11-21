@@ -17,6 +17,7 @@ import org.sopt.sopkathon_android2.data.service.FeedApiService
 import org.sopt.sopkathon_android2.data.di.FeedServiceModule
 import org.sopt.sopkathon_android2.presentation.feed.component.FeedScope
 import org.sopt.sopkathon_android2.presentation.feed.model.toUiModel
+import org.sopt.sopkathon_android2.presentation.feed.model.PostLikeUpdates
 
 class FeedViewModel(
     private val apiService: FeedApiService = FeedServiceModule.apiService,
@@ -32,6 +33,16 @@ class FeedViewModel(
     val uiEffect = _uiEffect.receiveAsFlow()
     private val likeJobs = mutableMapOf<Pair<Long, Long>, Job>()
     private val likeStates = mutableMapOf<Pair<Long, Long>, Pair<Boolean, Int>>()
+
+    init {
+        viewModelScope.launch {
+            PostLikeUpdates.updates.collect { update ->
+                if (userId == update.userId) {
+                    updateLike(update.userId, update.postId, update.liked, update.count)
+                }
+            }
+        }
+    }
 
     fun setUserId(userId: Long?) {
         if (this.userId == userId && (_uiState.value.isLoading || _uiState.value.posts.isNotEmpty())) return

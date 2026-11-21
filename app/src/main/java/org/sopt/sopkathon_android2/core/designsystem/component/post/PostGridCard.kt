@@ -1,4 +1,4 @@
-package org.sopt.sopkathon_android2.presentation.search.component
+package org.sopt.sopkathon_android2.core.designsystem.component.post
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,7 +31,7 @@ import org.sopt.sopkathon_android2.core.common.extensions.noRippleClickable
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 
 @Composable
-fun PopularPostCard(
+fun PostGridCard(
     title: String,
     imageUrl: String,
     likeCount: Int,
@@ -99,7 +99,7 @@ fun PopularPostCard(
 @Composable
 private fun PopularPostCardPreview() {
     SopkathonTheme {
-        PopularPostCard(
+        PostGridCard(
             title = "금요일 회식룩",
             imageUrl = "",
             likeCount = 18,

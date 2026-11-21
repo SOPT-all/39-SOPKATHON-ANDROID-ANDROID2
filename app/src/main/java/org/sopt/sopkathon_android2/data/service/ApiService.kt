@@ -2,15 +2,18 @@ package org.sopt.sopkathon_android2.data.service
 
 import org.sopt.sopkathon_android2.core.network.BaseResponse
 import org.sopt.sopkathon_android2.data.dto.request.ClothesCreateRequestDto
+import org.sopt.sopkathon_android2.data.dto.request.PostCreateRequestDto
 import org.sopt.sopkathon_android2.data.dto.request.PresignedUrlRequestDto
 import org.sopt.sopkathon_android2.data.dto.request.UserCreateRequestDto
 import org.sopt.sopkathon_android2.data.dto.response.ClothesCreateResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.ClothesListResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.CursorResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.FeedItemResponseDto
+import org.sopt.sopkathon_android2.data.dto.response.PostCreateResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.PresignedUrlResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.SearchUserResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.UserCreateResponseDto
+import org.sopt.sopkathon_android2.data.dto.response.UserProfileResponseDto
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -31,6 +34,12 @@ interface ApiService {
         @Body request: ClothesCreateRequestDto,
     ): BaseResponse<ClothesCreateResponseDto>
 
+    @POST("/api/v1/users/{userId}/posts")
+    suspend fun postPost(
+        @Path("userId") userId: Long,
+        @Body request: PostCreateRequestDto,
+    ): BaseResponse<PostCreateResponseDto>
+
     @POST("/api/v1/users")
     suspend fun postUser(
         @Body request: UserCreateRequestDto,
@@ -42,6 +51,11 @@ interface ApiService {
         @Query("position") position: String?,
         @Query("cursor") cursor: String?,
     ): BaseResponse<CursorResponseDto<SearchUserResponseDto>>
+
+    @GET("/api/v1/users/{userId}")
+    suspend fun getUser(
+        @Path("userId") userId: Long,
+    ): BaseResponse<UserProfileResponseDto>
 
     @GET("/api/v1/users/{userId}/feed")
     suspend fun getFeed(
