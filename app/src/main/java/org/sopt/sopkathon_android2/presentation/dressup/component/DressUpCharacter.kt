@@ -41,7 +41,7 @@ import org.sopt.sopkathon_android2.presentation.dressup.model.WornItemUiModel
 private val CharacterSize = DpSize(190.dp, 500.dp)
 
 /**
- * 받침대 위 캐릭터. 발, 하의, 손, 상의, 머리 순서로 쌓음
+ * 받침대 위 캐릭터. 몸, 하의, 상의, 머리 순서로 쌓음
  *
  * 받침대는 캡처에 안 들어가게 [StickerCanvas] 밖에 그림
  */
@@ -68,31 +68,20 @@ fun DressUpCharacter(
             },
             modifier = Modifier.fillMaxSize(),
         ) {
+            // 캐릭터 프레임과 같은 비율이라 프레임을 채움
             Image(
-                painter = painterResource(R.drawable.img_dressup_foot_left),
+                painter = painterResource(R.drawable.img_dressup_body),
                 contentDescription = null,
-                modifier = Modifier.offset(x = 52.dp, y = 484.dp),
-            )
-            Image(
-                painter = painterResource(R.drawable.img_dressup_foot_right),
-                contentDescription = null,
-                modifier = Modifier.offset(x = 99.dp, y = 484.dp),
+                modifier = Modifier.fillMaxSize(),
             )
             WornItemStickers(wornItems.filter { it.category == ClothesCategory.BOTTOM })
-            Image(
-                painter = painterResource(R.drawable.img_dressup_hand_left),
-                contentDescription = null,
-                modifier = Modifier.offset(x = (-3).dp, y = 293.dp),
-            )
-            Image(
-                painter = painterResource(R.drawable.img_dressup_hand_right),
-                contentDescription = null,
-                modifier = Modifier.offset(x = 152.dp, y = 293.dp),
-            )
             WornItemStickers(wornItems.filter { it.category == ClothesCategory.TOP })
+            // 몸 이미지의 목 윗선이 가운데로 파여 있어서 턱이 목 윗선을 덮도록 내림
             CharacterHead(
                 imageUri = headUri,
-                modifier = Modifier.align(Alignment.TopCenter),
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .offset(y = 10.dp),
             )
         }
     }
