@@ -1,7 +1,8 @@
 package org.sopt.sopkathon_android2.presentation.search
 
+import android.app.Application
 import android.util.Log
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -10,9 +11,10 @@ import kotlinx.coroutines.launch
 import org.sopt.sopkathon_android2.BuildConfig
 import org.sopt.sopkathon_android2.core.common.util.suspendRunCatching
 import org.sopt.sopkathon_android2.data.di.ServiceModule
+import org.sopt.sopkathon_android2.data.local.UserPreferences
 import retrofit2.HttpException
 
-class SearchViewModel : ViewModel() {
+class SearchViewModel(application: Application) : AndroidViewModel(application) {
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState = _uiState.asStateFlow()
     private var started = false
@@ -24,10 +26,11 @@ class SearchViewModel : ViewModel() {
     }
 
     private fun requestPopularPosts() {
-        val userId = BuildConfig.FEED_USER_ID
+        // 프로필 생성 때 저장한 값, 없으면 local.properties의 개발용 값
+        val userId = UserPreferences(getApplication()).userId ?: BuildConfig.FEED_USER_ID
         if (userId <= 0) {
             _uiState.update {
-                it.copy(isLoading = false, errorMessage = "인기 코디를 보려면 서버 사용자 ID가 필요해요.")
+                it.copy(isLoading = false, errorMessage = "인기 코디를 보려면 프로필을 먼저 만들어주세요.")
             }
             return
         }
