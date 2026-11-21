@@ -135,6 +135,10 @@ Git Flow를 사용해요.
 
 ## 📱 시연 영상
 
+https://github.com/user-attachments/assets/6b1e41ac-a563-40fc-8852-aa75259218dd
+
+
+
 
 
 
