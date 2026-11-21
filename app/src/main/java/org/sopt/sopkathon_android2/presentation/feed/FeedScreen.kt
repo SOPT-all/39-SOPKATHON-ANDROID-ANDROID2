@@ -21,11 +21,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import org.sopt.sopkathon_android2.core.common.extensions.toast
 import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 import org.sopt.sopkathon_android2.presentation.feed.component.FeedHeader
@@ -42,7 +40,6 @@ fun FeedRoute(
     viewModel: FeedViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
     FeedScreen(
         uiState = uiState,
@@ -52,10 +49,10 @@ fun FeedRoute(
         onLikeClick = viewModel::toggleLike,
         onColleagueClick = onColleagueClick,
         onPostClick = onPostClick,
-        onNotificationClick = { context.toast("알림 기능은 준비 중이에요") },
-        onTeamLookClick = { context.toast("팀룩 기능은 준비 중이에요") },
-        onMoreClick = { context.toast("더보기 기능은 준비 중이에요") },
-        onShareClick = { context.toast("공유 기능은 준비 중이에요") },
+        onNotificationClick = { },
+        onTeamLookClick = { },
+        onMoreClick = { },
+        onShareClick = { },
         modifier = modifier,
     )
 }
