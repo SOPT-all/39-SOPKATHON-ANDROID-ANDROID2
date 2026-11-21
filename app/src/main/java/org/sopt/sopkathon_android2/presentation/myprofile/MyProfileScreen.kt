@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.sopt.sopkathon_android2.R
@@ -43,6 +44,11 @@ fun MyProfileRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
+    // 코디를 올리고 돌아왔을 때 바로 반영되게 화면이 보일 때마다 다시 조회
+    LifecycleResumeEffect(Unit) {
+        viewModel.getMyProfile()
+        onPauseOrDispose { }
+    }
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {

@@ -29,10 +29,6 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
     private val _uiEffect = Channel<MyProfileUiEffect>(Channel.BUFFERED)
     val uiEffect: Flow<MyProfileUiEffect> = _uiEffect.receiveAsFlow()
 
-    init {
-        getMyProfile()
-    }
-
     fun getMyProfile() {
         if (_uiState.value.isLoading) return
         // 프로필 생성 때 저장한 값, 없으면 local.properties의 개발용 값

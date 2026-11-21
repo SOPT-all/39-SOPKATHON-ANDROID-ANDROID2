@@ -28,12 +28,8 @@ class ColleagueProfileViewModel(application: Application) : AndroidViewModel(app
     private val _uiEffect = Channel<ColleagueProfileUiEffect>(Channel.BUFFERED)
     val uiEffect: Flow<ColleagueProfileUiEffect> = _uiEffect.receiveAsFlow()
 
-    private var loadedUserId: Long? = null
-
     fun getProfile(userId: Long) {
-        // 화면 회전, 재진입 시 중복 요청 방지
-        if (loadedUserId == userId || _uiState.value.isLoading) return
-        loadedUserId = userId
+        if (_uiState.value.isLoading) return // 중복 요청 방지
 
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
@@ -60,7 +56,6 @@ class ColleagueProfileViewModel(application: Application) : AndroidViewModel(app
                 }
             }.onFailure { throwable ->
                 Log.e("ColleagueProfileViewModel", "동료 프로필 조회 실패", throwable)
-                loadedUserId = null
                 _uiState.update { it.copy(isLoading = false) }
                 _uiEffect.send(ColleagueProfileUiEffect.ShowToast("프로필을 불러오지 못했어요"))
             }
