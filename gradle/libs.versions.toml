@@ -14,10 +14,12 @@ retrofit = "3.0.0"
 okhttp = "5.3.2"
 kotlinxSerializationJson = "1.11.0"
 subjectSegmentation = "16.0.0-beta1"
+faceDetection = "16.1.7"
 exifInterface = "1.4.2"
 playServicesBase = "18.5.0"
 
 [libraries]
+mlkit-face-detection = { module = "com.google.mlkit:face-detection", version.ref = "faceDetection" }
 mlkit-subject-segmentation = { module = "com.google.android.gms:play-services-mlkit-subject-segmentation", version.ref = "subjectSegmentation" }
 androidx-exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifInterface" }
 google-play-services-base = { module = "com.google.android.gms:play-services-base", version.ref = "playServicesBase" }

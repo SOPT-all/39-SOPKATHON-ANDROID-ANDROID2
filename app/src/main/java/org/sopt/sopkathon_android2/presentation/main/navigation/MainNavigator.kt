@@ -17,6 +17,20 @@ fun NavController.navigateToFeedFromOnboarding() {
     }
 }
 
+// 온보딩(동의·프로필 생성)을 백스택에서 지우고 가입 완료로
+fun NavController.navigateToSignUpComplete(signUpComplete: SignUpComplete) {
+    navigate(signUpComplete) {
+        popUpTo<Consent> { inclusive = true }
+    }
+}
+
+// 가입 완료 화면을 지우고 피드로
+fun NavController.navigateToFeedFromSignUpComplete() {
+    navigate(Feed) {
+        popUpTo<SignUpComplete> { inclusive = true }
+    }
+}
+
 fun NavController.navigateToProfileCreate() {
     navigate(ProfileCreate)
 }
