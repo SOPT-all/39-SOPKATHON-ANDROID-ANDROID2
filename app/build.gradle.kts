@@ -66,6 +66,9 @@ dependencies {
     // Image
     implementation(libs.coil.compose)
     implementation(libs.coil.network)
+    implementation(libs.mlkit.subject.segmentation)
+    implementation(libs.androidx.exifinterface)
+    implementation(libs.google.play.services.base)
 
     // Network
     implementation(libs.retrofit.core)
