@@ -13,6 +13,7 @@ import org.sopt.sopkathon_android2.data.dto.response.PostCreateResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.PresignedUrlResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.SearchUserResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.UserCreateResponseDto
+import org.sopt.sopkathon_android2.data.dto.response.UserProfileResponseDto
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -50,6 +51,11 @@ interface ApiService {
         @Query("position") position: String?,
         @Query("cursor") cursor: String?,
     ): BaseResponse<CursorResponseDto<SearchUserResponseDto>>
+
+    @GET("/api/v1/users/{userId}")
+    suspend fun getUser(
+        @Path("userId") userId: Long,
+    ): BaseResponse<UserProfileResponseDto>
 
     @GET("/api/v1/users/{userId}/feed")
     suspend fun getFeed(

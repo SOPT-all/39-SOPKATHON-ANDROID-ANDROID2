@@ -138,6 +138,8 @@ fun MainNavHost(
 
         composable<MyProfile> {
             MyProfileRoute(
+                onPostClick = navController::navigateToPostDetail,
+                onCoordiClick = { navigator.navigateToTab(MainTab.COORDI) },
                 modifier = screenModifier,
             )
         }
@@ -149,6 +151,7 @@ fun MainNavHost(
                 userId = colleagueProfile.userId,
                 navigateUp = navController::navigateUp,
                 onPostClick = navController::navigateToPostDetail,
+                onCoordiClick = { navigator.navigateToTab(MainTab.COORDI) },
                 modifier = screenModifier,
             )
         }
