@@ -118,4 +118,4 @@ Git Flow를 사용해요.
 
 | Before | After |
 | :---: | :---: |
-| <img src="" width="400" /> | <img src="" width="400" /> |
+|<img width="370" height="250" alt="4D5BA886-88D3-4CEC-A461-5B37EC69E5F4" src="https://github.com/user-attachments/assets/f6c62fb8-e8b9-4b28-8cf3-ee69c6e9552d" />| <img src="" width="400" /> |
