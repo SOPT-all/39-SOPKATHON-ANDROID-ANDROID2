@@ -39,8 +39,12 @@ import org.sopt.sopkathon_android2.presentation.dressup.component.wardrobe.Cloth
 import org.sopt.sopkathon_android2.presentation.dressup.model.ClothesCategory
 import org.sopt.sopkathon_android2.presentation.dressup.model.WornItemUiModel
 
-// 피그마 캐릭터 프레임 크기. 캡처 영역
+// 피그마 캐릭터 프레임 크기
 private val CharacterSize = DpSize(190.dp, 500.dp)
+
+// 옷을 옆으로 옮기고 키울 수 있게 캐릭터 양옆으로 넓힌 캔버스. 캡처 영역
+private val CanvasSize = DpSize(280.dp, CharacterSize.height)
+private val CharacterInset = (CanvasSize.width - CharacterSize.width) / 2
 
 /**
  * 받침대 위 캐릭터. 몸, 하의, 상의, 머리 순서로 쌓음
@@ -56,8 +60,12 @@ fun DressUpCharacter(
     onStickerActionClick: (key: Any) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier.size(CharacterSize)) {
-        Pedestal(modifier = Modifier.offset(x = 5.dp, y = 484.dp))
+    Box(modifier = modifier.size(CanvasSize)) {
+        Pedestal(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = 484.dp),
+        )
         StickerCanvas(
             state = stickerState,
             onDeleteClick = onItemDelete,
@@ -74,7 +82,9 @@ fun DressUpCharacter(
             Image(
                 painter = painterResource(R.drawable.img_dressup_body),
                 contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .size(CharacterSize),
             )
             WornItemStickers(wornItems.filter { it.category == ClothesCategory.BOTTOM })
             WornItemStickers(wornItems.filter { it.category == ClothesCategory.TOP })
@@ -96,7 +106,11 @@ private fun StickerCanvasScope.WornItemStickers(items: List<WornItemUiModel>) {
     items.forEach { item ->
         key(item.key) {
             val (size, position) = item.category.stickerFrame()
-            Sticker(key = item.key, size = size, initialPosition = position) {
+            Sticker(
+                key = item.key,
+                size = size,
+                initialPosition = DpOffset(position.x + CharacterInset, position.y),
+            ) {
                 if (item.imageUri != null) {
                     AsyncImage(
                         model = ImageRequest.Builder(context)
