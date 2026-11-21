@@ -14,6 +14,14 @@ fun MainScreen(
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
+        bottomBar = {
+            if (navigator.shouldShowBottomBar()) {
+                MainBottomBar(
+                    currentTab = navigator.currentTab(),
+                    onTabClick = navigator::navigateToTab,
+                )
+            }
+        },
     ) { innerPadding ->
         MainNavHost(
             navigator = navigator,

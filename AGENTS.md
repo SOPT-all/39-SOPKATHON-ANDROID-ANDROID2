@@ -6,7 +6,7 @@ Commands: build `./gradlew assembleDebug`, compile only `./gradlew :app:compileD
 
 ## Before editing
 
-Find the task in [docs/index.md](docs/index.md) and read that page first. For a new screen, copy `presentation/home`.
+Find the task in [docs/index.md](docs/index.md) and read that page first. For a new screen, copy `presentation/feed`.
 
 ## Rules
 

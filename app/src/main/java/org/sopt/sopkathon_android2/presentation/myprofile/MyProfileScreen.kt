@@ -1,15 +1,16 @@
 package org.sopt.sopkathon_android2.presentation.myprofile
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 
 @Composable
@@ -30,18 +31,22 @@ private fun MyProfileScreen(
     uiState: MyProfileUiState,
     modifier: Modifier = Modifier,
 ) {
-    Box(
+    Column(
         modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(text = uiState.title)
+
     }
 }
 
-@Preview(showBackground = true)
+@ScreenPreview
 @Composable
 private fun MyProfileScreenPreview() {
     SopkathonTheme {
-        MyProfileScreen(uiState = MyProfileUiState(title = "MyProfile"))
+        MyProfileScreen(
+            uiState = MyProfileUiState(title = "MyProfile"),
+        )
     }
 }

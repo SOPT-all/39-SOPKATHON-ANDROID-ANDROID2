@@ -7,9 +7,9 @@
 | Function | lowerCamelCase | `fun getUser()` |
 | Composable | UpperCamelCase | `fun PostCard()` |
 | Variable | lowerCamelCase | `val postCount` |
-| Class, interface | UpperCamelCase | `class HomeViewModel` |
+| Class, interface | UpperCamelCase | `class FeedViewModel` |
 | `const val` | SCREAMING_SNAKE_CASE | `const val MAX_COUNT` |
-| Screen folder | lowercase | `home`, `missiondetail` |
+| Screen folder | lowercase | `feed`, `postdetail` |
 | UI model | `XxxUiModel` | `PostUiModel` |
 | Navigation | `navigateToXxx()` | `navigateToHome()` |
 | Drawable | Name from the designer | |
