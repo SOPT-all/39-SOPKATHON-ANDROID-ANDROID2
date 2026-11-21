@@ -3,6 +3,7 @@ package org.sopt.sopkathon_android2.core.designsystem.theme
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
+private val White = Color(0xFFFFFFFF)
 private val CoolGray25 = Color(0xFFF9FAFB)
 private val CoolGray50 = Color(0xFFF3F5F8)
 private val CoolGray100 = Color(0xFFEBEDF0)
@@ -19,6 +20,7 @@ private val CoolGray950 = Color(0xFF0E1012)
 
 @Immutable
 data class SopkathonColors(
+    val white: Color,
     val coolGray25: Color,
     val coolGray50: Color,
     val coolGray100: Color,
@@ -35,6 +37,7 @@ data class SopkathonColors(
 )
 
 val defaultSopkathonColors = SopkathonColors(
+    white = White,
     coolGray25 = CoolGray25,
     coolGray50 = CoolGray50,
     coolGray100 = CoolGray100,
