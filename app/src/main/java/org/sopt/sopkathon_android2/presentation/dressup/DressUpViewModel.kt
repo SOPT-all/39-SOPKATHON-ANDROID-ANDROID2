@@ -37,29 +37,33 @@ class DressUpViewModel(application: Application) : AndroidViewModel(application)
     val uiEffect: Flow<DressUpUiEffect> = _uiEffect.receiveAsFlow()
 
     fun setColleague(dressUp: DressUp) {
-        // 화면이 다시 만들어질 때 중복 조회 방지
-        if (::colleague.isInitialized && colleague.colleagueId == dressUp.colleagueId) return
-        colleague = dressUp
-        showColleague(dressUp)
-        // 게시물 상세처럼 id만 넘어오면 이름, 사진을 서버에서 조회
-        if (dressUp.name.isBlank() || dressUp.profileImageUrl == null) getColleagueProfile(dressUp.colleagueId)
+        if (dressUp.name.isBlank()) {
+            loadColleague(dressUp.colleagueId)
+            return
+        }
+        applyColleague(dressUp)
     }
 
-    private fun showColleague(dressUp: DressUp) {
+    private fun applyColleague(dressUp: DressUp) {
+        colleague = dressUp
         _uiState.update { it.copy(colleagueName = "${dressUp.name} ${dressUp.position}".trim()) }
         dressUp.profileImageUrl?.let(::makeCharacterHead)
     }
 
-    private fun getColleagueProfile(colleagueId: Long) {
+    // 게시물 상세 '입혀보기'처럼 id만 넘어온 경우 동료 정보 조회
+    private fun loadColleague(colleagueId: Long) {
+        colleague = DressUp(colleagueId)
         viewModelScope.launch {
             suspendRunCatching { requireNotNull(ServiceModule.apiService.getUser(colleagueId).data) }
-                .onSuccess { profile ->
-                    colleague = colleague.copy(
-                        name = profile.name,
-                        position = profile.position,
-                        profileImageUrl = profile.profileImageUrl,
+                .onSuccess { user ->
+                    applyColleague(
+                        DressUp(
+                            colleagueId = colleagueId,
+                            name = user.name.trim(),
+                            position = user.position.trim(),
+                            profileImageUrl = user.profileImageUrl?.ifBlank { null },
+                        ),
                     )
-                    showColleague(colleague)
                 }
                 .onFailure { Log.e(TAG, "동료 정보 조회 실패", it) }
         }
