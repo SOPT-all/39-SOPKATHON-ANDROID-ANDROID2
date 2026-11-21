@@ -20,5 +20,5 @@ data class ClothesResponseDto(
     @SerialName("imageUrl")
     val imageUrl: String,
     @SerialName("purchaseLink")
-    val purchaseLink: String? = null, // 옷 추가 때 링크는 선택이라 비어 올 수 있음
+    val purchaseLink: String? = null, // 예전 데이터나 서버 응답에서 비어 올 수 있음
 )

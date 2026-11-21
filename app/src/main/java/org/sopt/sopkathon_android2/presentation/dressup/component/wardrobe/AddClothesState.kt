@@ -3,6 +3,7 @@ package org.sopt.sopkathon_android2.presentation.dressup.component.wardrobe
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -22,6 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.sopt.sopkathon_android2.core.common.util.suspendRunCatching
 import org.sopt.sopkathon_android2.core.imageprocessing.ClothingCutoutProcessor
+import org.sopt.sopkathon_android2.core.imageprocessing.CutoutException
 import org.sopt.sopkathon_android2.core.imageprocessing.CutoutFiles
 import org.sopt.sopkathon_android2.core.network.PresignedUrlUploader
 import org.sopt.sopkathon_android2.data.di.ServiceModule
@@ -101,7 +103,10 @@ internal class AddClothesState(
             }.onSuccess { trimmed ->
                 deleteCutout()
                 cutoutUri = trimmed
-            }.onFailure { Log.e(TAG, "옷 배경 제거 실패", it) }
+            }.onFailure {
+                Log.e(TAG, "옷 배경 제거 실패", it)
+                showToast(it.toCutoutFailMessage())
+            }
             isProcessing = false
             deleteCameraFile()
         }
@@ -133,7 +138,10 @@ internal class AddClothesState(
                             category = category,
                         ),
                     )
-                }.onFailure { Log.e(TAG, "옷 추가 실패", it) }
+                }.onFailure {
+                    Log.e(TAG, "옷 추가 실패", it)
+                    showToast("옷을 추가하지 못했어요. 다시 시도해 주세요.")
+                }
             isUploading = false
         }
     }
@@ -185,10 +193,23 @@ internal class AddClothesState(
         withContext(Dispatchers.IO) { uri.toFile().delete() }
     }
 
+    private fun showToast(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+
     private fun deleteCameraFile() {
         cameraFile?.delete()
         cameraFile = null
     }
+}
+
+private fun Throwable.toCutoutFailMessage(): String = when ((this as? CutoutException)?.reason) {
+    CutoutException.Reason.NO_FOREGROUND -> "옷을 찾지 못했어요. 옷이 잘 보이는 사진으로 다시 올려 주세요."
+    CutoutException.Reason.MODEL_NOT_READY -> "배경 제거를 준비하고 있어요. 잠시 뒤 다시 시도해 주세요."
+    CutoutException.Reason.PLAY_SERVICES_UNAVAILABLE -> "이 기기에서는 배경 제거를 쓸 수 없어요."
+    CutoutException.Reason.IMAGE_TOO_LARGE -> "사진이 너무 커요. 다른 사진을 골라 주세요."
+    CutoutException.Reason.IMAGE_UNREADABLE -> "사진을 읽지 못했어요. 다른 사진을 골라 주세요."
+    else -> "배경을 지우지 못했어요. 다시 시도해 주세요."
 }
 
 @Composable
