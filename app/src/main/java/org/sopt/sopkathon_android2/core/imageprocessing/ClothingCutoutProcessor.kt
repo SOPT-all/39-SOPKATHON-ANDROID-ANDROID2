@@ -10,5 +10,5 @@ class ClothingCutoutProcessor(context: Context) {
 
     suspend fun prepareModel() = engine.prepareModel()
 
-    suspend fun process(imageUri: Uri): Uri = engine.process(imageUri) { _, foreground -> foreground }
+    suspend fun process(imageUri: Uri): Uri = engine.process(imageUri)
 }

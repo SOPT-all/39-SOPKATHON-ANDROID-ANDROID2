@@ -3,7 +3,6 @@ package org.sopt.sopkathon_android2.core.imageprocessing
 import android.content.Context
 import android.net.Uri
 import org.sopt.sopkathon_android2.core.imageprocessing.internal.CutoutEngine
-import org.sopt.sopkathon_android2.core.imageprocessing.internal.PortraitMask
 
 class PortraitCutoutProcessor(context: Context) {
     private val engine = CutoutEngine(context)
@@ -11,7 +10,5 @@ class PortraitCutoutProcessor(context: Context) {
 
     suspend fun prepareModel() = engine.prepareModel()
 
-    suspend fun process(imageUri: Uri): Uri = engine.process(imageUri) { input, foreground ->
-        PortraitMask.apply(input, foreground)
-    }
+    suspend fun process(imageUri: Uri): Uri = engine.process(imageUri)
 }
