@@ -8,14 +8,20 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import okhttp3.Call
+import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.math.max
 import kotlin.math.min
 
@@ -43,15 +49,35 @@ object PresignedUrlUploader {
      * @param presignedUrl 서버에서 받은 업로드 URL
      * @param uri 갤러리에서 고른 이미지
      */
-    suspend fun upload(context: Context, presignedUrl: String, uri: Uri) = withContext(Dispatchers.IO) {
-        val bytes = compress(context.contentResolver, uri)
+    suspend fun upload(context: Context, presignedUrl: String, uri: Uri) {
+        val bytes = withContext(Dispatchers.IO) { compress(context.contentResolver, uri) }
         val request = Request.Builder()
             .url(presignedUrl)
             .put(bytes.toRequestBody(CONTENT_TYPE.toMediaType()))
             .build()
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw IOException("이미지 업로드 실패: ${response.code}")
-        }
+        client.newCall(request).await()
+    }
+
+    // 화면을 나가 코루틴이 취소되면 업로드 요청도 취소
+    private suspend fun Call.await() = suspendCancellableCoroutine { continuation ->
+        continuation.invokeOnCancellation { cancel() }
+        enqueue(
+            object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    continuation.resumeWithException(e)
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    response.use {
+                        if (response.isSuccessful) {
+                            continuation.resume(Unit)
+                        } else {
+                            continuation.resumeWithException(IOException("이미지 업로드 실패: ${response.code}"))
+                        }
+                    }
+                }
+            },
+        )
     }
 
     // 폰 사진(3~10MB)은 그대로 올리면 느려서 긴 변을 MAX_SIZE로 줄이고 JPEG로 재저장
