@@ -2,7 +2,7 @@ package org.sopt.sopkathon_android2.presentation.dressup
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -25,6 +27,9 @@ import org.sopt.sopkathon_android2.presentation.dressup.component.DressUpCharact
 import org.sopt.sopkathon_android2.presentation.dressup.component.DressUpTopBar
 import org.sopt.sopkathon_android2.presentation.dressup.component.ItemInfoBottomSheet
 import org.sopt.sopkathon_android2.presentation.dressup.model.ItemInfoInput
+
+// 피그마에서 앱 바 아래부터 하단 버튼 줄 위까지 높이
+private val CharacterAreaHeight = 580.dp
 
 // 2.2 옷 입히기
 @Composable
@@ -74,12 +79,15 @@ private fun DressUpScreen(
             colleagueName = uiState.colleagueName,
             onBackClick = navigateUp,
         )
-        Box(
+        BoxWithConstraints(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
                 .pointerInput(stickerState) { detectTapGestures { stickerState.clearSelection() } },
         ) {
+            // 피그마보다 낮은 화면에서 받침대가 하단 버튼에 가리지 않게 비율 그대로 줄임
+            val scale = (maxHeight / CharacterAreaHeight).coerceAtMost(1f)
+
             // 왼쪽 옷장 폭만큼 오른쪽으로 비켜 둠 (피그마 캐릭터 x 119)
             DressUpCharacter(
                 wornItems = uiState.wornItems,
@@ -88,7 +96,12 @@ private fun DressUpScreen(
                 onStickerActionClick = onStickerActionClick,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .offset(x = 34.dp, y = 52.dp),
+                    .offset(x = 34.dp, y = 52.dp * scale)
+                    .graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
+                        transformOrigin = TransformOrigin(0.5f, 0f)
+                    },
             )
         }
         DressUpBottomActions(
