@@ -28,6 +28,10 @@ data object Feed : Route
 @Serializable
 data object Search : Route
 
+// 6.1 검색 입력
+@Serializable
+data object SearchInput : Route
+
 // 2.1 동료 선택 (하단 탭 '코디 만들기')
 @Serializable
 data object ColleagueSelect : Route

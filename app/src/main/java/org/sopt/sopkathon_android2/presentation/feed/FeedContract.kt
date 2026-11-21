@@ -45,3 +45,7 @@ data class FeedUiState(
         )
     }
 }
+
+sealed interface FeedUiEffect {
+    data object LikeFailed : FeedUiEffect
+}
