@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@color/white" />
+    <!-- 안드로이드 12 이상 시스템 스플래시 아이콘과 같은 크기 -->
     <item
-        android:width="240dp"
-        android:height="240dp"
+        android:width="288dp"
+        android:height="288dp"
         android:drawable="@drawable/img_splash_icon"
         android:gravity="center" />
 </layer-list>
