@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
@@ -22,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -31,9 +33,11 @@ import coil3.ColorImage
 import coil3.annotation.ExperimentalCoilApi
 import coil3.compose.AsyncImagePreviewHandler
 import coil3.compose.LocalAsyncImagePreviewHandler
+import org.sopt.sopkathon_android2.core.common.extensions.toast
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 import org.sopt.sopkathon_android2.presentation.dressup.component.wardrobe.model.WardrobeCategory
 import org.sopt.sopkathon_android2.presentation.dressup.component.wardrobe.model.WardrobeClothes
+import org.sopt.sopkathon_android2.presentation.dressup.component.wardrobe.model.WardrobeUiEffect
 import org.sopt.sopkathon_android2.presentation.dressup.component.wardrobe.model.WardrobeUiState
 
 private val CollapsedShape = RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp)
@@ -51,6 +55,17 @@ fun WardrobeDrawer(
     viewModel: WardrobeViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val currentOnClothesAdd by rememberUpdatedState(onClothesAdd)
+
+    LaunchedEffect(viewModel) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                is WardrobeUiEffect.ClothesAdded -> currentOnClothesAdd(effect.clothes)
+                WardrobeUiEffect.ShowAddErrorToast -> context.toast("옷을 추가하지 못했어요. 다시 시도해 주세요.")
+            }
+        }
+    }
 
     WardrobeDrawerContent(
         uiState = uiState,
@@ -64,10 +79,8 @@ fun WardrobeDrawer(
 
     if (uiState.isAddSheetVisible) {
         AddClothesBottomSheet(
-            onClothesAdd = { clothes ->
-                viewModel.onClothesAdd(clothes)
-                onClothesAdd(clothes)
-            },
+            isUploading = uiState.isUploading,
+            onAddClick = viewModel::onClothesAdd,
             onDismiss = viewModel::onAddSheetDismiss,
         )
     }

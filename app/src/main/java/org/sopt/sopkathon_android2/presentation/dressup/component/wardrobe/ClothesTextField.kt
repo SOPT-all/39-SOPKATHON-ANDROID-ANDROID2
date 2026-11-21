@@ -51,7 +51,7 @@ internal fun ClothesTextField(
     val density = LocalDensity.current
     val imeBottom = WindowInsets.ime.getBottom(density)
 
-    // 기본 동작은 커서 줄만 보여서 키보드가 다 올라온 뒤 입력칸 전체와 아래 여백까지 올림
+    // 기본 동작은 커서 줄만 보여서 키보드가 올라오는 동안 입력칸 전체와 아래 여백까지 계속 맞춤
     LaunchedEffect(isFocused, imeBottom) {
         if (isFocused && imeBottom > 0) {
             val bottomMargin = with(density) { FIELD_KEYBOARD_MARGIN.toPx() }

@@ -85,7 +85,7 @@ internal fun ClothesUploader(
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = "배경은 자동으로 지워져요 · JPG, PNG 10MB 이하",
+                            text = "배경은 자동으로 지워져요",
                             style = SopkathonTheme.typography.caption,
                             color = colors.coolGray500,
                         )

@@ -23,10 +23,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,18 +42,20 @@ import androidx.compose.ui.unit.sp
 import org.sopt.sopkathon_android2.core.common.extensions.clearFocusOnTap
 import org.sopt.sopkathon_android2.core.common.extensions.noRippleClickable
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
+import org.sopt.sopkathon_android2.presentation.dressup.component.wardrobe.model.ClothesDraft
 import org.sopt.sopkathon_android2.presentation.dressup.component.wardrobe.model.WardrobeCategory
-import org.sopt.sopkathon_android2.presentation.dressup.component.wardrobe.model.WardrobeClothes
 
 private val SheetScrimColor = Color.Black.copy(alpha = 0.45f)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddClothesBottomSheet(
-    onClothesAdd: (WardrobeClothes) -> Unit,
+    isUploading: Boolean,
+    onAddClick: (ClothesDraft) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val state = rememberAddClothesState()
+    val currentIsUploading by rememberUpdatedState(isUploading)
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { isSaved ->
         state.onCameraResult(isSaved)
     }
@@ -62,10 +67,16 @@ fun AddClothesBottomSheet(
 
     ModalBottomSheet(
         onDismissRequest = {
-            state.discard()
-            onDismiss()
+            if (!currentIsUploading) {
+                state.discard()
+                onDismiss()
+            }
         },
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        // 업로드 중에 닫히면 요청이 취소돼 서버에만 옷이 생길 수 있어 닫히지 않게 함
+        sheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = true,
+            confirmValueChange = { it != SheetValue.Hidden || !currentIsUploading },
+        ),
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
         containerColor = SopkathonTheme.colors.coolGray50,
         scrimColor = SheetScrimColor,
@@ -84,15 +95,15 @@ fun AddClothesBottomSheet(
             category = state.category,
             nameState = state.nameState,
             linkState = state.linkState,
-            isAddEnabled = state.isAddEnabled,
-            isUploading = state.isUploading,
+            isAddEnabled = state.isAddEnabled && !isUploading,
+            isUploading = isUploading,
             onCameraClick = { cameraLauncher.launch(state.newCameraUri()) },
             onGalleryClick = {
                 galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
             },
             onReselectClick = state::reselect,
             onCategorySelect = { state.category = it },
-            onAddClick = { state.add(onClothesAdd) },
+            onAddClick = { state.toDraft()?.let(onAddClick) },
         )
     }
 }
