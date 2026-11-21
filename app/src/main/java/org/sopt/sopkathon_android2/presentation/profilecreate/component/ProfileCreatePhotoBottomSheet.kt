@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -50,7 +49,7 @@ fun ProfileCreatePhotoBottomSheet(
             )
         },
     ) {
-        Column(modifier = Modifier.navigationBarsPadding().padding(bottom = 24.dp)) {
+        Column(modifier = Modifier.padding(bottom = 24.dp)) {
             Column(
                 modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
