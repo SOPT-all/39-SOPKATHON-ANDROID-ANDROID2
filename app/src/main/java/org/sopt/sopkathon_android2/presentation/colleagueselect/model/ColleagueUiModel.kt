@@ -5,5 +5,4 @@ data class ColleagueUiModel(
     val name: String,
     val position: String,
     val team: String,
-    val coordiCount: Int,
 )

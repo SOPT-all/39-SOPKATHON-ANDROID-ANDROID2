@@ -9,12 +9,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,7 +31,7 @@ import org.sopt.sopkathon_android2.core.common.extensions.noRippleClickable
 import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 import org.sopt.sopkathon_android2.presentation.colleagueselect.component.ColleagueSelectFilterChip
-import org.sopt.sopkathon_android2.presentation.colleagueselect.component.ColleagueSelectPersonCard
+import org.sopt.sopkathon_android2.presentation.colleagueselect.component.ColleagueSelectPersonItem
 import org.sopt.sopkathon_android2.presentation.colleagueselect.model.ColleagueUiModel
 
 // 2.1 동료 선택
@@ -62,11 +60,11 @@ private fun ColleagueSelectScreen(
     onNextClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val gridState = rememberLazyGridState()
+    val listState = rememberLazyListState()
 
     // 필터 변경 시 맨 위로
     LaunchedEffect(uiState.selectedPosition) {
-        if (gridState.firstVisibleItemIndex != 0) gridState.scrollToItem(0)
+        if (listState.firstVisibleItemIndex != 0) listState.scrollToItem(0)
     }
 
     Box(
@@ -104,21 +102,17 @@ private fun ColleagueSelectScreen(
                 }
             }
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                state = gridState,
+            LazyColumn(
+                state = listState,
                 modifier = Modifier.weight(1f),
-                // 하단 버튼에 마지막 카드가 가리지 않게 여백
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 120.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                // 하단 버튼에 마지막 행이 가리지 않게 여백
+                contentPadding = PaddingValues(bottom = 120.dp),
             ) {
                 items(items = uiState.filteredColleagues, key = { it.id }) { colleague ->
-                    ColleagueSelectPersonCard(
+                    ColleagueSelectPersonItem(
                         name = colleague.name,
                         position = colleague.position,
                         team = colleague.team,
-                        coordiCount = colleague.coordiCount,
                         isSelected = colleague.id == uiState.selectedColleagueId,
                         onClick = { onColleagueClick(colleague.id) },
                     )
@@ -187,12 +181,10 @@ private fun ColleagueSelectScreenPreview() {
         ColleagueSelectScreen(
             uiState = ColleagueSelectUiState(
                 colleagues = listOf(
-                    ColleagueUiModel(id = 1, name = "박정훈", position = "부장", team = "영업1팀", coordiCount = 12),
-                    ColleagueUiModel(id = 2, name = "이준호", position = "사원", team = "영업1팀", coordiCount = 3),
-                    ColleagueUiModel(id = 3, name = "최은지", position = "부장", team = "영업1팀", coordiCount = 8),
-                    ColleagueUiModel(id = 4, name = "정태호", position = "차장", team = "영업1팀", coordiCount = 4),
-                    ColleagueUiModel(id = 5, name = "한지민", position = "대리", team = "영업1팀", coordiCount = 5),
-                    ColleagueUiModel(id = 6, name = "김상희", position = "부장", team = "영업2팀", coordiCount = 1),
+                    ColleagueUiModel(id = 1, name = "박정훈", position = "부장", team = "영업1팀"),
+                    ColleagueUiModel(id = 2, name = "한지민", position = "부장", team = "마케팅1팀"),
+                    ColleagueUiModel(id = 3, name = "김상희", position = "차장", team = "디자인1팀"),
+                    ColleagueUiModel(id = 4, name = "위상훈", position = "사원", team = "영업3팀"),
                 ),
                 selectedColleagueId = 1,
             ),
@@ -202,4 +194,3 @@ private fun ColleagueSelectScreenPreview() {
         )
     }
 }
-
