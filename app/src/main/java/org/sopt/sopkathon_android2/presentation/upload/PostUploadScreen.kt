@@ -1,35 +1,63 @@
 package org.sopt.sopkathon_android2.presentation.upload
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import org.sopt.sopkathon_android2.core.common.extensions.clearFocusOnTap
 import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
+import org.sopt.sopkathon_android2.presentation.main.navigation.PostUpload
+import org.sopt.sopkathon_android2.presentation.upload.component.PostUploadButton
+import org.sopt.sopkathon_android2.presentation.upload.component.PostUploadNotice
+import org.sopt.sopkathon_android2.presentation.upload.component.PostUploadOutfitSummary
+import org.sopt.sopkathon_android2.presentation.upload.component.PostUploadTextField
+import org.sopt.sopkathon_android2.presentation.upload.component.PostUploadTopBar
+import org.sopt.sopkathon_android2.presentation.upload.component.PostVisibilitySelector
+import org.sopt.sopkathon_android2.presentation.upload.model.PostVisibility
 
-// 2.3 게시글 업로드
+// 2.3 코디 게시하기
 @Composable
 fun PostUploadRoute(
-    colleagueId: Long,
+    postUpload: PostUpload,
     navigateUp: () -> Unit,
-    onUploadClick: () -> Unit,
+    navigateToFeed: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PostUploadViewModel = viewModel(),
 ) {
-    // TODO 서버 연동 시 colleagueId로 데이터 요청
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(postUpload) { viewModel.setOutfit(postUpload) }
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                PostUploadUiEffect.NavigateToFeed -> navigateToFeed()
+            }
+        }
+    }
 
     PostUploadScreen(
         uiState = uiState,
+        titleState = viewModel.titleState,
+        descriptionState = viewModel.descriptionState,
         navigateUp = navigateUp,
-        onUploadClick = onUploadClick,
+        onVisibilityClick = viewModel::onVisibilityClick,
+        onPostClick = viewModel::onPostClick,
         modifier = modifier,
     )
 }
@@ -37,24 +65,72 @@ fun PostUploadRoute(
 @Composable
 private fun PostUploadScreen(
     uiState: PostUploadUiState,
+    titleState: TextFieldState,
+    descriptionState: TextFieldState,
     navigateUp: () -> Unit,
-    onUploadClick: () -> Unit,
+    onVisibilityClick: (PostVisibility) -> Unit,
+    onPostClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .fillMaxSize()
+            .background(SopkathonTheme.colors.white)
+            .imePadding()
+            .clearFocusOnTap(),
     ) {
-        Text(text = uiState.title)
+        PostUploadTopBar(
+            title = "코디 게시하기",
+            navigateUp = navigateUp,
+        )
 
-        // 네비게이션 확인용 임시 버튼, 화면 구현 시 교체
-        TextButton(onClick = { navigateUp() }) {
-            Text(text = "뒤로")
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(start = 16.dp, top = 4.dp, end = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            PostUploadOutfitSummary(
+                imageUri = uiState.imageUri,
+                colleagueName = uiState.colleagueName,
+                colleaguePosition = uiState.colleaguePosition,
+                items = uiState.items,
+            )
+
+            PostUploadTextField(
+                state = titleState,
+                label = "제목",
+                placeholder = "제목을 입력해 주세요",
+                maxLength = PostUploadUiState.TITLE_MAX_LENGTH,
+                imeAction = ImeAction.Next,
+            )
+
+            PostUploadTextField(
+                state = descriptionState,
+                label = "한 줄 소개 (선택)",
+                placeholder = "${uiState.colleaguePosition}님께 어울릴 코디를 소개해 주세요",
+                maxLength = PostUploadUiState.DESCRIPTION_MAX_LENGTH,
+                isSingleLine = false,
+                imeAction = ImeAction.Done,
+            )
+
+            PostVisibilitySelector(
+                selected = uiState.visibility,
+                onSelect = onVisibilityClick,
+            )
+
+            if (uiState.incompleteCategoryLabels.isNotEmpty()) {
+                PostUploadNotice(categoryLabels = uiState.incompleteCategoryLabels)
+            }
         }
-        TextButton(onClick = { onUploadClick() }) {
-            Text(text = "게시하기")
-        }
+
+        PostUploadButton(
+            text = "피드에 게시하기",
+            isEnabled = uiState.isPostEnabled,
+            onClick = onPostClick,
+            modifier = Modifier.padding(start = 16.dp, top = 12.dp, end = 16.dp, bottom = 24.dp),
+        )
     }
 }
 
@@ -63,9 +139,12 @@ private fun PostUploadScreen(
 private fun PostUploadScreenPreview() {
     SopkathonTheme {
         PostUploadScreen(
-            uiState = PostUploadUiState(title = "PostUpload"),
+            uiState = PostUploadUiState.dummy,
+            titleState = rememberTextFieldState(PostUploadUiState.dummy.title),
+            descriptionState = rememberTextFieldState(),
             navigateUp = {},
-            onUploadClick = {},
+            onVisibilityClick = {},
+            onPostClick = {},
         )
     }
 }
