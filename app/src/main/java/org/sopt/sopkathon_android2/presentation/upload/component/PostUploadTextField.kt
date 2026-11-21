@@ -6,9 +6,13 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
@@ -18,9 +22,11 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,6 +60,13 @@ fun PostUploadTextField(
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
     val inputTransformation = remember(maxLength) { GraphemeMaxLengthTransformation(maxLength) }
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+    val imeBottom = WindowInsets.ime.getBottom(LocalDensity.current)
+
+    // 기본 동작은 커서 줄만 보여서 여러 줄 칸의 아래와 글자 수가 키보드에 가려짐. 키보드가 올라오는 동안 칸 전체를 맞춤
+    LaunchedEffect(isFocused, imeBottom) {
+        if (isFocused && imeBottom > 0) bringIntoViewRequester.bringIntoView()
+    }
     val boxModifier = when {
         isFocused -> Modifier
             .background(colors.white, FieldShape)
@@ -67,7 +80,9 @@ fun PostUploadTextField(
     }
 
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .bringIntoViewRequester(bringIntoViewRequester),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         Text(
