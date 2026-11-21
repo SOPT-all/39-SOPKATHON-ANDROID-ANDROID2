@@ -101,7 +101,7 @@ class PostUploadViewModel : ViewModel() {
     }
 
     companion object {
-        // 로그인 사용자 ID를 저장하는 곳이 아직 없어 임시 값
-        private const val AUTHOR_ID = 1L
+        // 서버에 1번 사용자가 없어 피드 조회와 같은 백엔드 테스트 사용자로 둔 임시 값
+        private const val AUTHOR_ID = 3L
     }
 }
