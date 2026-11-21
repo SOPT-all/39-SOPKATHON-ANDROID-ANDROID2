@@ -34,12 +34,17 @@ import org.sopt.sopkathon_android2.presentation.feed.component.FeedTeamLookBanne
 
 @Composable
 fun FeedRoute(
+    userId: Long?,
     onColleagueClick: (Long) -> Unit,
     onPostClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FeedViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(userId) {
+        viewModel.setUserId(userId)
+    }
 
     FeedScreen(
         uiState = uiState,

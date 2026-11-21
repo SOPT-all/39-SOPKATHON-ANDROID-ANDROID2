@@ -1,15 +1,17 @@
 package org.sopt.sopkathon_android2.presentation.feed
 
+import android.util.Log
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.launch
-import org.sopt.sopkathon_android2.presentation.feed.model.DummyFeedPageSource
-import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import org.sopt.sopkathon_android2.core.common.util.suspendRunCatching
+import org.sopt.sopkathon_android2.data.di.ServiceModule
 import org.sopt.sopkathon_android2.presentation.feed.component.FeedScope
+import org.sopt.sopkathon_android2.presentation.feed.model.toUiModel
 
 class FeedViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(FeedUiState())
@@ -18,7 +20,11 @@ class FeedViewModel : ViewModel() {
     private var pageJob: Job? = null
     private var generation = 0
 
-    init {
+    private var userId: Long? = null
+
+    fun setUserId(userId: Long?) {
+        if (this.userId == userId && (_uiState.value.isLoading || _uiState.value.posts.isNotEmpty())) return
+        this.userId = userId
         refresh()
     }
 
@@ -48,19 +54,30 @@ class FeedViewModel : ViewModel() {
 
     private fun requestPage(isRefresh: Boolean) {
         val state = _uiState.value
+        val currentUserId = userId?.takeIf { it > 0 } ?: run {
+            _uiState.update { it.copy(isLoading = false, loadError = "사용자 정보가 필요해요") }
+            return
+        }
         val requestGeneration = generation
         _uiState.update { it.copy(isLoading = true, loadError = null) }
         pageJob = viewModelScope.launch {
-            try {
-                val page = DummyFeedPageSource.getPage(
-                    scope = state.selectedScope,
+            suspendRunCatching {
+                val popular = state.selectedScope == FeedScope.POPULAR
+                val response = ServiceModule.apiService.getFeed(
+                    userId = currentUserId,
+                    sort = if (popular) "POPULAR" else "LATEST",
+                    period = if (popular) "WEEK" else null,
                     cursor = if (isRefresh) null else state.nextCursor,
-                    limit = 5,
+                    limit = 20,
                 )
-                if (requestGeneration != generation) return@launch
+                check(response.status in 200..299) { response.code }
+                requireNotNull(response.data)
+            }.onSuccess { page ->
+                if (requestGeneration != generation) return@onSuccess
+                val posts = page.items.map { it.toUiModel() }
                 _uiState.update {
                     it.copy(
-                        posts = (if (isRefresh) page.items else it.posts + page.items)
+                        posts = (if (isRefresh) posts else it.posts + posts)
                             .distinctBy { post -> post.postId },
                         nextCursor = page.nextCursor,
                         hasMore = page.hasMore && page.nextCursor != null &&
@@ -68,9 +85,8 @@ class FeedViewModel : ViewModel() {
                         isLoading = false,
                     )
                 }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
+            }.onFailure { throwable ->
+                Log.e("FeedViewModel", "피드 조회 실패", throwable)
                 if (requestGeneration == generation) {
                     _uiState.update {
                         it.copy(isLoading = false, loadError = "목록을 불러오지 못했어요")
