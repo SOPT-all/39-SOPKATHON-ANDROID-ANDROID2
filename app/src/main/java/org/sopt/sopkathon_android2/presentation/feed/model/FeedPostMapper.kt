@@ -2,6 +2,7 @@ package org.sopt.sopkathon_android2.presentation.feed.model
 
 import org.sopt.sopkathon_android2.core.designsystem.component.post.PostAuthorUiModel
 import org.sopt.sopkathon_android2.data.dto.response.FeedPostResponseDto
+import org.sopt.sopkathon_android2.data.mapper.normalizePostTimestamp
 
 fun FeedPostResponseDto.toUiModel() = FeedPostUiModel(
     postId = postId,
@@ -14,7 +15,7 @@ fun FeedPostResponseDto.toUiModel() = FeedPostUiModel(
     ),
     targetLabel = "${targetUser.name.trim()} ${targetUser.position.trim()}님 코디",
     scopeLabel = "",
-    createdAt = createdAt,
+    createdAt = createdAt.normalizePostTimestamp(),
     imageUrl = imageUrl,
     hashtag = "",
     title = title,

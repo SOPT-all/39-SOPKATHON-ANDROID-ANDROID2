@@ -3,6 +3,9 @@ package org.sopt.sopkathon_android2.presentation.feed
 import androidx.lifecycle.ViewModelStore
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.runBlocking
+import org.sopt.sopkathon_android2.presentation.feed.model.PostLikeUpdate
+import org.sopt.sopkathon_android2.presentation.feed.model.PostLikeUpdates
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -59,6 +62,26 @@ class FeedLikeTest {
             api.result.complete(BaseResponse(200, "OK", "", PostLikeResponseDto(501, false, 17)))
             instrumentation.waitForIdleSync()
             assertFalse(vm.uiState.value.posts.single().isLiked)
+        }
+    }
+
+    @Test
+    fun detailLikeUpdatesFeedWithoutReloadingAndIgnoresOtherUsers() {
+        val api = LikeApi()
+        withViewModel(api) { vm ->
+            runBlocking { PostLikeUpdates.publish(PostLikeUpdate(1, 501, true, 23)) }
+            instrumentation.waitForIdleSync()
+            instrumentation.runOnMainSync {
+                assertTrue(vm.uiState.value.posts.single().isLiked)
+                assertEquals(23, vm.uiState.value.posts.single().likeCount)
+                assertEquals(1, api.reads)
+            }
+            runBlocking { PostLikeUpdates.publish(PostLikeUpdate(2, 501, false, 22)) }
+            instrumentation.waitForIdleSync()
+            instrumentation.runOnMainSync {
+                assertTrue(vm.uiState.value.posts.single().isLiked)
+                assertEquals(23, vm.uiState.value.posts.single().likeCount)
+            }
         }
     }
 

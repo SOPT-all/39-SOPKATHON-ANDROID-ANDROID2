@@ -45,8 +45,8 @@ fun NavController.navigateToDressUp(colleagueId: Long) {
     navigate(DressUp(colleagueId))
 }
 
-fun NavController.navigateToPostUpload(colleagueId: Long) {
-    navigate(PostUpload(colleagueId))
+fun NavController.navigateToPostUpload(postUpload: PostUpload) {
+    navigate(postUpload)
 }
 
 // 게시 후 코디 만들기 흐름을 지우고 피드로
