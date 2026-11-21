@@ -25,8 +25,6 @@ import org.sopt.sopkathon_android2.presentation.upload.OutfitUploader
 import org.sopt.sopkathon_android2.presentation.upload.model.OutfitUploadItem
 import org.sopt.sopkathon_android2.presentation.upload.model.toPostUpload
 
-private const val TAG = "DressUpViewModel"
-
 class DressUpViewModel(application: Application) : AndroidViewModel(application) {
     private val headMaker = CharacterHeadMaker(application)
     private lateinit var colleague: DressUp
@@ -111,6 +109,10 @@ class DressUpViewModel(application: Application) : AndroidViewModel(application)
                 .onFailure { Log.e(TAG, "코디 업로드 실패", it) }
             _uiState.update { it.copy(isUploading = false) }
         }
+    }
+
+    companion object {
+        private const val TAG = "DressUpViewModel"
     }
 }
 
