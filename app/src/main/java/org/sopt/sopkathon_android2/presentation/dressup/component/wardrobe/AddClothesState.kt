@@ -3,7 +3,6 @@ package org.sopt.sopkathon_android2.presentation.dressup.component.wardrobe
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -21,16 +20,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.sopt.sopkathon_android2.core.common.extensions.toast
 import org.sopt.sopkathon_android2.core.common.util.suspendRunCatching
 import org.sopt.sopkathon_android2.core.imageprocessing.ClothingCutoutProcessor
 import org.sopt.sopkathon_android2.core.imageprocessing.CutoutException
 import org.sopt.sopkathon_android2.core.imageprocessing.CutoutFiles
-import org.sopt.sopkathon_android2.core.network.PresignedUrlUploader
-import org.sopt.sopkathon_android2.data.di.ServiceModule
-import org.sopt.sopkathon_android2.data.dto.request.ClothesCreateRequestDto
-import org.sopt.sopkathon_android2.data.dto.request.PresignedUrlRequestDto
+import org.sopt.sopkathon_android2.presentation.dressup.component.wardrobe.model.ClothesDraft
 import org.sopt.sopkathon_android2.presentation.dressup.component.wardrobe.model.WardrobeCategory
-import org.sopt.sopkathon_android2.presentation.dressup.component.wardrobe.model.WardrobeClothes
 import java.io.File
 
 private const val TAG = "AddClothesState"
@@ -61,12 +57,9 @@ internal class AddClothesState(
     var isProcessing: Boolean by mutableStateOf(false)
         private set
 
-    var isUploading: Boolean by mutableStateOf(false)
-        private set
-
     // 서버가 purchaseLink를 빈 값으로 받지 않아 링크까지 있어야 추가 가능
     val isAddEnabled: Boolean
-        get() = cutoutUri != null && category != null && linkState.text.isNotBlank() && !isProcessing && !isUploading
+        get() = cutoutUri != null && category != null && linkState.text.isNotBlank() && !isProcessing
 
     // 첫 누끼 때 모델 다운로드를 기다리지 않도록 시트가 열릴 때 미리 준비
     suspend fun prepareModel() {
@@ -105,7 +98,7 @@ internal class AddClothesState(
                 cutoutUri = trimmed
             }.onFailure {
                 Log.e(TAG, "옷 배경 제거 실패", it)
-                showToast(it.toCutoutFailMessage())
+                context.toast(it.toCutoutFailMessage())
             }
             isProcessing = false
             deleteCameraFile()
@@ -117,33 +110,16 @@ internal class AddClothesState(
         scope.launch { deleteCutout() }
     }
 
-    fun add(onAdded: (WardrobeClothes) -> Unit) {
-        val uri = cutoutUri ?: return
-        val category = category ?: return
-        if (!isAddEnabled) return
-        val name = nameState.text.toString().trim().ifBlank { category.label }
-        val link = linkState.text.toString().trim()
-        scope.launch {
-            isUploading = true
-            suspendRunCatching { postClothes(uri, name, link, category) }
-                .onSuccess { clothesId ->
-                    // 다시 불러오기 전까지 누끼 파일로 보여 주므로 지우지 않음
-                    cutoutUri = null
-                    onAdded(
-                        WardrobeClothes(
-                            clothesId = clothesId,
-                            name = name,
-                            imageUrl = uri.toString(),
-                            purchaseLink = link,
-                            category = category,
-                        ),
-                    )
-                }.onFailure {
-                    Log.e(TAG, "옷 추가 실패", it)
-                    showToast("옷을 추가하지 못했어요. 다시 시도해 주세요.")
-                }
-            isUploading = false
-        }
+    fun toDraft(): ClothesDraft? {
+        val uri = cutoutUri ?: return null
+        val category = category ?: return null
+        if (!isAddEnabled) return null
+        return ClothesDraft(
+            cutoutUri = uri,
+            name = nameState.text.toString().trim().ifBlank { category.label },
+            purchaseLink = linkState.text.toString().trim(),
+            category = category,
+        )
     }
 
     fun discard() {
@@ -152,30 +128,6 @@ internal class AddClothesState(
             cutoutUri = null
             scope.launch { deleteFile(uri) }
         }
-    }
-
-    private suspend fun postClothes(
-        cutoutUri: Uri,
-        name: String,
-        link: String,
-        category: WardrobeCategory,
-    ): Long {
-        val presignedUrl = requireNotNull(
-            ServiceModule.apiService.postPresignedUrl(
-                PresignedUrlRequestDto(contentType = PresignedUrlUploader.PNG_CONTENT_TYPE),
-            ).data,
-        )
-        PresignedUrlUploader.uploadPng(context, presignedUrl.presignedUrl, cutoutUri)
-        return requireNotNull(
-            ServiceModule.apiService.postClothes(
-                ClothesCreateRequestDto(
-                    name = name,
-                    imageKey = presignedUrl.imageKey,
-                    purchaseLink = link,
-                    category = category.name,
-                ),
-            ).data,
-        ).clothesId
     }
 
     private suspend fun deleteCutout() {
@@ -191,10 +143,6 @@ internal class AddClothesState(
 
     private suspend fun deleteFile(uri: Uri) {
         withContext(Dispatchers.IO) { uri.toFile().delete() }
-    }
-
-    private fun showToast(message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun deleteCameraFile() {
