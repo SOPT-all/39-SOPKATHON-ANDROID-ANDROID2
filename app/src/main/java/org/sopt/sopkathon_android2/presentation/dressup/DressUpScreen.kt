@@ -1,18 +1,30 @@
 package org.sopt.sopkathon_android2.presentation.dressup
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import org.sopt.sopkathon_android2.core.designsystem.component.StickerCanvasState
+import org.sopt.sopkathon_android2.core.designsystem.component.rememberStickerCanvasState
 import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
+import org.sopt.sopkathon_android2.presentation.dressup.component.DressUpBottomActions
+import org.sopt.sopkathon_android2.presentation.dressup.component.DressUpCharacter
+import org.sopt.sopkathon_android2.presentation.dressup.component.DressUpTopBar
+import org.sopt.sopkathon_android2.presentation.dressup.component.ItemInfoBottomSheet
+import org.sopt.sopkathon_android2.presentation.dressup.model.ItemInfoInput
 
 // 2.2 옷 입히기
 @Composable
@@ -28,8 +40,14 @@ fun DressUpRoute(
 
     DressUpScreen(
         uiState = uiState,
+        stickerState = rememberStickerCanvasState(),
         navigateUp = navigateUp,
         onCompleteClick = onCompleteClick,
+        onItemDelete = viewModel::onItemDelete,
+        onStickerActionClick = viewModel::onStickerActionClick,
+        onPurchaseLinkClick = viewModel::onPurchaseLinkClick,
+        onItemInfoSave = viewModel::onItemInfoSave,
+        onItemInfoSheetDismiss = viewModel::onItemInfoSheetDismiss,
         modifier = modifier,
     )
 }
@@ -37,24 +55,57 @@ fun DressUpRoute(
 @Composable
 private fun DressUpScreen(
     uiState: DressUpUiState,
+    stickerState: StickerCanvasState,
     navigateUp: () -> Unit,
     onCompleteClick: () -> Unit,
+    onItemDelete: (key: Any) -> Unit,
+    onStickerActionClick: (key: Any) -> Unit,
+    onPurchaseLinkClick: () -> Unit,
+    onItemInfoSave: (List<ItemInfoInput>) -> Unit,
+    onItemInfoSheetDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .fillMaxSize()
+            .background(SopkathonTheme.colors.coolGray50),
     ) {
-        Text(text = uiState.title)
+        DressUpTopBar(
+            colleagueName = uiState.colleagueName,
+            onBackClick = navigateUp,
+        )
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .pointerInput(stickerState) { detectTapGestures { stickerState.clearSelection() } },
+        ) {
+            // 왼쪽 옷장 폭만큼 오른쪽으로 비켜 둠 (피그마 캐릭터 x 119)
+            DressUpCharacter(
+                wornItems = uiState.wornItems,
+                stickerState = stickerState,
+                onItemDelete = onItemDelete,
+                onStickerActionClick = onStickerActionClick,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .offset(x = 34.dp, y = 52.dp),
+            )
+        }
+        DressUpBottomActions(
+            incompleteCount = uiState.incompleteCount,
+            isCompleteEnabled = uiState.wornItems.isNotEmpty(),
+            onPurchaseLinkClick = onPurchaseLinkClick,
+            onCompleteClick = onCompleteClick,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+        )
+    }
 
-        // 네비게이션 확인용 임시 버튼, 화면 구현 시 교체
-        TextButton(onClick = { navigateUp() }) {
-            Text(text = "뒤로")
-        }
-        TextButton(onClick = { onCompleteClick() }) {
-            Text(text = "코디 완성")
-        }
+    uiState.itemInfoSheetItems?.let { items ->
+        ItemInfoBottomSheet(
+            items = items,
+            onSaveClick = onItemInfoSave,
+            onDismissRequest = onItemInfoSheetDismiss,
+        )
     }
 }
 
@@ -63,9 +114,15 @@ private fun DressUpScreen(
 private fun DressUpScreenPreview() {
     SopkathonTheme {
         DressUpScreen(
-            uiState = DressUpUiState(title = "DressUp"),
+            uiState = DressUpUiState.dummy,
+            stickerState = rememberStickerCanvasState(),
             navigateUp = {},
             onCompleteClick = {},
+            onItemDelete = {},
+            onStickerActionClick = {},
+            onPurchaseLinkClick = {},
+            onItemInfoSave = {},
+            onItemInfoSheetDismiss = {},
         )
     }
 }
