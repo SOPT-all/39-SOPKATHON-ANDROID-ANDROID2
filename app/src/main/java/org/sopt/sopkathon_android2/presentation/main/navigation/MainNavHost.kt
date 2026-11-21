@@ -1,5 +1,6 @@
 package org.sopt.sopkathon_android2.presentation.main.navigation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 import org.sopt.sopkathon_android2.presentation.colleagueprofile.ColleagueProfileRoute
 import org.sopt.sopkathon_android2.presentation.colleagueselect.ColleagueSelectRoute
 import org.sopt.sopkathon_android2.presentation.consent.ConsentRoute
@@ -130,7 +132,10 @@ fun MainNavHost(
                 dressUp = backStackEntry.toRoute<DressUp>(),
                 navigateUp = navController::navigateUp,
                 navigateToPostUpload = navController::navigateToPostUpload,
-                modifier = screenModifier,
+                // 화면 배경색을 상태 바, 네비게이션 바 뒤까지
+                modifier = Modifier
+                    .background(SopkathonTheme.colors.coolGray50)
+                    .then(screenModifier),
             )
         }
 
