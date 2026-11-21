@@ -18,6 +18,7 @@ import org.sopt.sopkathon_android2.presentation.myprofile.MyProfileRoute
 import org.sopt.sopkathon_android2.presentation.postdetail.PostDetailRoute
 import org.sopt.sopkathon_android2.presentation.profilecreate.ProfileCreateRoute
 import org.sopt.sopkathon_android2.presentation.search.SearchRoute
+import org.sopt.sopkathon_android2.presentation.search.searchinput.SearchInputRoute
 import org.sopt.sopkathon_android2.presentation.profilecreate.signupcomplete.SignUpCompleteRoute
 import org.sopt.sopkathon_android2.presentation.upload.PostUploadRoute
 
@@ -87,8 +88,16 @@ fun MainNavHost(
         // 6 → 동료 프로필 / 게시물 상세 (B3, B5)
         composable<Search> {
             SearchRoute(
-                onColleagueClick = navController::navigateToColleagueProfile,
+                onSearchClick = navController::navigateToSearchInput,
                 onPostClick = navController::navigateToPostDetail,
+                modifier = screenModifier,
+            )
+        }
+
+        composable<SearchInput> {
+            SearchInputRoute(
+                navigateUp = navController::navigateUp,
+                onColleagueClick = navController::navigateToColleagueProfile,
                 modifier = screenModifier,
             )
         }

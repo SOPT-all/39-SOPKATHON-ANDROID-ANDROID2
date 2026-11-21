@@ -16,16 +16,19 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.sopt.sopkathon_android2.core.common.extensions.clearFocusOnTap
+import org.sopt.sopkathon_android2.core.common.extensions.toast
 import org.sopt.sopkathon_android2.presentation.profilecreate.component.AppbarBack
 import org.sopt.sopkathon_android2.presentation.profilecreate.component.ProfileCreateTextField
 import org.sopt.sopkathon_android2.presentation.profilecreate.component.PhotoUploader
@@ -46,6 +49,16 @@ fun ProfileCreateRoute(
     viewModel: ProfileCreateViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                is ProfileCreateUiEffect.NavigateToSignUpComplete -> onSaveClick(effect.route)
+                is ProfileCreateUiEffect.ShowToast -> context.toast(effect.message)
+            }
+        }
+    }
     val photoPickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let(viewModel::updatePhoto)
     }
@@ -59,17 +72,7 @@ fun ProfileCreateRoute(
         },
         onDepartmentSelect = viewModel::updateDepartment,
         onRankSelect = viewModel::updateRank,
-        // TODO 서버 연동 시 프로필 저장 API 호출 후 이동
-        onSaveClick = {
-            onSaveClick(
-                SignUpComplete(
-                    name = uiState.name,
-                    department = uiState.department,
-                    rank = uiState.rank,
-                    photoUri = uiState.photoUri?.toString().orEmpty(),
-                ),
-            )
-        },
+        onSaveClick = viewModel::saveProfile,
         modifier = modifier,
     )
 }
