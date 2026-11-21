@@ -10,7 +10,7 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import org.sopt.sopkathon_android2.data.service.ApiService
+import org.sopt.sopkathon_android2.data.service.FeedApiService
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 
@@ -37,7 +37,7 @@ class FeedApiTest {
             .client(client)
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
-            .create(ApiService::class.java)
+            .create(FeedApiService::class.java)
         val response = api.getFeed(userId = 42, cursor = "a+/= cursor")
         assertEquals(false, response.data?.hasMore)
     }
@@ -63,7 +63,7 @@ class FeedApiTest {
             .client(client)
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
-            .create(ApiService::class.java)
+            .create(FeedApiService::class.java)
         assertEquals(true, api.postPostLike(1, 501).data?.liked)
         val deleted = api.deletePostLike(1, 501).data
         assertEquals(false, deleted?.liked)

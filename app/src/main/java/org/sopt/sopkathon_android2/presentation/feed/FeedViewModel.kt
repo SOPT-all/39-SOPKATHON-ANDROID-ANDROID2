@@ -13,13 +13,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.sopt.sopkathon_android2.core.common.util.suspendRunCatching
-import org.sopt.sopkathon_android2.data.service.ApiService
-import org.sopt.sopkathon_android2.data.di.ServiceModule
+import org.sopt.sopkathon_android2.data.service.FeedApiService
+import org.sopt.sopkathon_android2.data.di.FeedServiceModule
 import org.sopt.sopkathon_android2.presentation.feed.component.FeedScope
 import org.sopt.sopkathon_android2.presentation.feed.model.toUiModel
 
 class FeedViewModel(
-    private val apiService: ApiService = ServiceModule.apiService,
+    private val apiService: FeedApiService = FeedServiceModule.apiService,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(FeedUiState())
     val uiState = _uiState.asStateFlow()
