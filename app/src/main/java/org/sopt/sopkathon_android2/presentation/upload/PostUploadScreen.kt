@@ -23,7 +23,6 @@ import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 import org.sopt.sopkathon_android2.presentation.main.navigation.PostUpload
 import org.sopt.sopkathon_android2.presentation.upload.component.PostUploadButton
-import org.sopt.sopkathon_android2.presentation.upload.component.PostUploadNotice
 import org.sopt.sopkathon_android2.presentation.upload.component.PostUploadOutfitSummary
 import org.sopt.sopkathon_android2.presentation.upload.component.PostUploadTextField
 import org.sopt.sopkathon_android2.presentation.upload.component.PostUploadTopBar
@@ -119,10 +118,6 @@ private fun PostUploadScreen(
                 selected = uiState.visibility,
                 onSelect = onVisibilityClick,
             )
-
-            if (uiState.incompleteCategoryLabels.isNotEmpty()) {
-                PostUploadNotice(categoryLabels = uiState.incompleteCategoryLabels)
-            }
         }
 
         PostUploadButton(

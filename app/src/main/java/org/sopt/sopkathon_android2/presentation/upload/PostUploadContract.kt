@@ -21,9 +21,6 @@ data class PostUploadUiState(
     val isPostEnabled: Boolean
         get() = title.isNotBlank() && !isLoading
 
-    val incompleteCategoryLabels: List<String>
-        get() = items.filterNot { it.isInfoComplete }.map { it.categoryLabel }.distinct()
-
     companion object {
         const val TITLE_MAX_LENGTH = 20
         const val DESCRIPTION_MAX_LENGTH = 60
