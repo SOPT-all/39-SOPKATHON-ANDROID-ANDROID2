@@ -56,6 +56,9 @@ fun PostCard(
 | Text input screen | `imePadding()` + `verticalScroll(rememberScrollState())`, `clearFocusOnTap()` on the root |
 | Input at the bottom of the scroll area | Add `scrollToEndOnFocus(scrollState)` before `verticalScroll(scrollState)`. Not when inputs are in the middle |
 | Character count, max length | `text.graphemeLength()`, not `length` (이모지를 1자로 셈) |
+| Crop an image | `ImageCropper(imageUri, aspectRatio, state = cropperState)` with `rememberImageCropperState()`. On the confirm button (enabled when `cropperState.isLoaded`), call `cropperState.crop()`. It gives a cache file `Uri` |
+| Move and resize stickers | `StickerCanvas(rememberStickerCanvasState(), Modifier.size(<character size>)) { Sticker(key, size, initialPosition) { } }`. The canvas is the capture area, so size it to the character and put the background outside it. The sticker content uses `fillMaxSize()`. The first call is drawn at the bottom |
+| Save the sticker canvas as an image | `stickerState.capture()` from `rememberCoroutineScope()`. It gives a transparent PNG `Uri` in the cache. Upload it with `PresignedUrlUploader.uploadPng` |
 
 ## Preview
 

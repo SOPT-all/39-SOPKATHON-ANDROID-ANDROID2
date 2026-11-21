@@ -106,11 +106,11 @@ The server gives a presigned URL, and the app uploads the image to it directly.
 
 | Step | Do |
 | --- | --- |
-| 1 | Get the presigned URL from the server. If it asks for a Content-Type, send `PresignedUrlUploader.CONTENT_TYPE` |
-| 2 | `PresignedUrlUploader.upload(context, presignedUrl, uri)` |
+| 1 | Get the presigned URL from the server. If it asks for a Content-Type, send `PresignedUrlUploader.CONTENT_TYPE` (`PNG_CONTENT_TYPE` for a transparent image) |
+| 2 | `PresignedUrlUploader.upload(context, presignedUrl, uri)`. A transparent PNG (capture, cutout): `uploadPng(context, presignedUrl, uri)` |
 | 3 | Send the image key (or URL) to the server |
 
-`PresignedUrlUploader` resizes the image and saves it as JPEG before uploading.
+`upload` resizes the image and saves it as JPEG before uploading. `uploadPng` uploads the file as it is, so the transparent background stays.
 
 ```kotlin
 // XxxRoute
