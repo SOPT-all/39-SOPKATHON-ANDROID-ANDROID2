@@ -54,6 +54,7 @@ fun PostCard(
 | Image from URL | Coil `AsyncImage(model = url, contentDescription = null)` |
 | Status / navigation bar padding | Already applied: `MainNavHost` passes Scaffold `paddingValues`. Don't add `statusBarsPadding()` again |
 | Text input screen | `imePadding()` + `verticalScroll(rememberScrollState())`, `clearFocusOnTap()` on the root |
+| Input at the bottom of the scroll area | Add `scrollToEndOnFocus(scrollState)` before `verticalScroll(scrollState)`. Not when inputs are in the middle |
 | Character count, max length | `text.graphemeLength()`, not `length` (이모지를 1자로 셈) |
 
 ## Preview
