@@ -5,6 +5,13 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import org.sopt.sopkathon_android2.data.local.UserPreferences
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -76,8 +83,7 @@ fun MainNavHost(
         // 1 → 동료 프로필 (B2), 게시물 상세
         composable<Feed> {
             FeedRoute(
-                // 프로필 생성 API 연동 전 백엔드 테스트 사용자 ID
-                userId = 3L,
+                userId = rememberStoredUserId(),
                 onColleagueClick = navController::navigateToColleagueProfile,
                 onPostClick = navController::navigateToPostDetail,
                 onCreateOutfitClick = navController::navigateToColleagueSelect,
@@ -151,12 +157,26 @@ fun MainNavHost(
         composable<PostDetail> { backStackEntry ->
             val postDetail = backStackEntry.toRoute<PostDetail>()
             PostDetailRoute(
+                userId = rememberStoredUserId(),
                 postId = postDetail.postId,
                 navigateUp = navController::navigateUp,
                 onColleagueClick = navController::navigateToColleagueProfile,
-                onDressUpClick = navController::navigateToColleagueSelect,
+                onDressUpClick = navController::navigateToDressUp,
                 modifier = screenModifier,
             )
         }
     }
+}
+
+@Composable
+private fun rememberStoredUserId(): Long? {
+    val context = LocalContext.current
+    val preferences = remember(context) { UserPreferences(context) }
+    var userId by remember(preferences) { mutableStateOf(preferences.userId) }
+
+    LifecycleResumeEffect(preferences) {
+        userId = preferences.userId
+        onPauseOrDispose { }
+    }
+    return userId
 }
