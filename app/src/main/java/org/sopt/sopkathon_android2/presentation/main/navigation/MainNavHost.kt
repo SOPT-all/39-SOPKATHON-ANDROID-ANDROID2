@@ -76,8 +76,11 @@ fun MainNavHost(
         // 1 → 동료 프로필 (B2), 게시물 상세
         composable<Feed> {
             FeedRoute(
+                // 프로필 생성 API 연동 전 백엔드 테스트 사용자 ID
+                userId = 3L,
                 onColleagueClick = navController::navigateToColleagueProfile,
                 onPostClick = navController::navigateToPostDetail,
+                onCreateOutfitClick = navController::navigateToColleagueSelect,
                 modifier = screenModifier,
             )
         }
