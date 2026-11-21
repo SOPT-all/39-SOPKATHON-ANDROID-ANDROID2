@@ -103,7 +103,7 @@ private fun ItemInfoTextFieldPreview() {
             ItemInfoTextField(state = rememberTextFieldState("네이비 크루넥 니트"), label = "아이템 이름", placeholder = "")
             ItemInfoTextField(
                 state = rememberTextFieldState("H&M 데님 바지"),
-                label = "쇼핑몰 링크 (선택)",
+                label = "쇼핑몰 링크",
                 placeholder = "링크를 붙여 넣어 주세요",
                 error = "https:// 로 시작하는 링크를 붙여 넣어 주세요",
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),

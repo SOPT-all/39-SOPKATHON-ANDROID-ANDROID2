@@ -220,7 +220,7 @@ private fun ItemInfoCard(
         )
         ItemInfoTextField(
             state = draft.link,
-            label = "쇼핑몰 링크 (선택)",
+            label = "쇼핑몰 링크",
             placeholder = "링크를 붙여 넣어 주세요",
             error = if (isLinkError) "https:// 로 시작하는 링크를 붙여 넣어 주세요" else null,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Done),

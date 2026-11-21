@@ -106,7 +106,7 @@ private fun DressUpScreen(
         }
         DressUpBottomActions(
             incompleteCount = uiState.incompleteCount,
-            isCompleteEnabled = uiState.wornItems.isNotEmpty(),
+            isCompleteEnabled = uiState.isCompleteEnabled,
             onPurchaseLinkClick = onPurchaseLinkClick,
             onCompleteClick = onCompleteClick,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),

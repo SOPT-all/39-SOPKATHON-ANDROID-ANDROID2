@@ -13,6 +13,10 @@ data class DressUpUiState(
 ) {
     val incompleteCount: Int get() = wornItems.count { !it.isInfoComplete }
 
+    // 서버 옷 추가 API가 링크를 필수로 받아서 링크 없는 옷이 있으면 코디 완성을 막음
+    val isCompleteEnabled: Boolean
+        get() = wornItems.isNotEmpty() && wornItems.all { it.link.isNotBlank() }
+
     val itemInfoSheetItems: List<WornItemUiModel>?
         get() = itemInfoSheetKeys?.let { keys -> wornItems.filter { it.key in keys } }
 
