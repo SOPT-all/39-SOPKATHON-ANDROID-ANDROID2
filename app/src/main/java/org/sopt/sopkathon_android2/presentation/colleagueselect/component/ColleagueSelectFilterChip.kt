@@ -2,7 +2,6 @@ package org.sopt.sopkathon_android2.presentation.colleagueselect.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -16,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.sopt.sopkathon_android2.core.common.extensions.noRippleClickable
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 
 @Composable
@@ -39,7 +39,7 @@ fun ColleagueSelectFilterChip(
                     Modifier.border(width = 1.dp, color = SopkathonTheme.colors.coolGray100, shape = shape)
                 },
             )
-            .clickable(onClick = onClick)
+            .noRippleClickable(onClick = onClick)
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center,
     ) {

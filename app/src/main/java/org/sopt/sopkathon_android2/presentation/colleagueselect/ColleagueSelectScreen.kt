@@ -1,7 +1,6 @@
 package org.sopt.sopkathon_android2.presentation.colleagueselect
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import org.sopt.sopkathon_android2.core.common.extensions.noRippleClickable
 import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 import org.sopt.sopkathon_android2.presentation.colleagueselect.component.ColleagueSelectFilterChip
@@ -166,7 +166,7 @@ private fun ColleagueSelectNextButton(
             .heightIn(min = 56.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(if (isEnabled) SopkathonTheme.colors.coolGray950 else SopkathonTheme.colors.coolGray150)
-            .clickable(enabled = isEnabled, onClick = onClick)
+            .noRippleClickable(enabled = isEnabled, onClick = onClick)
             .padding(horizontal = 24.dp),
         contentAlignment = Alignment.Center,
     ) {

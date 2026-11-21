@@ -2,7 +2,6 @@ package org.sopt.sopkathon_android2.presentation.colleagueselect.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.sopt.sopkathon_android2.R
+import org.sopt.sopkathon_android2.core.common.extensions.noRippleClickable
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 
 @Composable
@@ -49,7 +49,7 @@ fun ColleagueSelectPersonCard(
                 color = if (isSelected) SopkathonTheme.colors.coolGray300 else SopkathonTheme.colors.coolGray100,
                 shape = shape,
             )
-            .clickable(onClick = onClick)
+            .noRippleClickable(onClick = onClick)
             .padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 10.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
