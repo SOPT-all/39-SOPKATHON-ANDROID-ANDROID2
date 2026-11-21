@@ -86,12 +86,12 @@ class MainNavigator(
         return MainTab.entries.find { tab -> destination?.hasRoute(tab.route::class) == true }
     }
 
-    // 피그마 기준 하단 탭이 보이는 화면: 탭 4개 + 동료 프로필 + 게시물 상세
+    // 피그마 기준 하단 탭이 보이는 화면: 탭 4개 + 동료 프로필
     @Composable
     fun shouldShowBottomBar(): Boolean {
         val destination = currentDestination() ?: return false
         if (currentTab() != null) return true
-        return destination.hasRoute(ColleagueProfile::class) || destination.hasRoute(PostDetail::class)
+        return destination.hasRoute(ColleagueProfile::class)
     }
 
     fun navigateToTab(tab: MainTab) {
