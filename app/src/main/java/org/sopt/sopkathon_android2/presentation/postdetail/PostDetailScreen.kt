@@ -42,7 +42,7 @@ import org.sopt.sopkathon_android2.presentation.postdetail.model.toWebUrlOrNull
 @Composable
 fun PostDetailRoute(
     postId: Long,
-    userId: Long,
+    userId: Long?,
     navigateUp: () -> Unit,
     onColleagueClick: (Long) -> Unit,
     onDressUpClick: (Long) -> Unit,
@@ -52,7 +52,7 @@ fun PostDetailRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val snackbar = LocalSopkathonSnackbarState.current
-    LaunchedEffect(userId, postId) { viewModel.load(userId, postId) }
+    LaunchedEffect(userId, postId) { viewModel.load(userId ?: 0L, postId) }
     LaunchedEffect(viewModel) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
