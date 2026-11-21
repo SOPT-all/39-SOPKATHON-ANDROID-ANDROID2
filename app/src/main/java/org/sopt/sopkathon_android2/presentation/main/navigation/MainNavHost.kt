@@ -18,6 +18,7 @@ import org.sopt.sopkathon_android2.presentation.myprofile.MyProfileRoute
 import org.sopt.sopkathon_android2.presentation.postdetail.PostDetailRoute
 import org.sopt.sopkathon_android2.presentation.profilecreate.ProfileCreateRoute
 import org.sopt.sopkathon_android2.presentation.search.SearchRoute
+import org.sopt.sopkathon_android2.presentation.profilecreate.signupcomplete.SignUpCompleteRoute
 import org.sopt.sopkathon_android2.presentation.upload.PostUploadRoute
 
 @Composable
@@ -45,11 +46,28 @@ fun MainNavHost(
             )
         }
 
-        // 0.3 → 1 (02)
+        // 0.3 → 0.3-7
         composable<ProfileCreate> {
             ProfileCreateRoute(
                 navigateUp = navController::navigateUp,
-                onSaveClick = navController::navigateToFeedFromOnboarding,
+                onSaveClick = navController::navigateToSignUpComplete,
+                modifier = screenModifier,
+            )
+        }
+
+        // 0.3-7 → 피드 / 동료 선택
+        composable<SignUpComplete> { backStackEntry ->
+            val signUpComplete = backStackEntry.toRoute<SignUpComplete>()
+            SignUpCompleteRoute(
+                name = signUpComplete.name,
+                department = signUpComplete.department,
+                rank = signUpComplete.rank,
+                photoUri = signUpComplete.photoUri,
+                onFeedClick = navController::navigateToFeedFromSignUpComplete,
+                onFirstCoordiClick = {
+                    navController.navigateToFeedFromSignUpComplete()
+                    navController.navigateToColleagueSelect()
+                },
                 modifier = screenModifier,
             )
         }
