@@ -61,6 +61,10 @@ fun NavController.navigateToColleagueProfile(userId: Long) {
     navigate(ColleagueProfile(userId))
 }
 
+fun NavController.navigateToSearchInput() {
+    navigate(SearchInput)
+}
+
 fun NavController.navigateToPostDetail(postId: Long) {
     navigate(PostDetail(postId))
 }
