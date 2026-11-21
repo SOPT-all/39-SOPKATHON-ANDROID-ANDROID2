@@ -14,8 +14,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.sopt.sopkathon_android2.BuildConfig
 import org.sopt.sopkathon_android2.core.common.util.suspendRunCatching
+import org.sopt.sopkathon_android2.data.di.FeedServiceModule
 import org.sopt.sopkathon_android2.data.di.ServiceModule
 import org.sopt.sopkathon_android2.data.local.UserPreferences
+import org.sopt.sopkathon_android2.data.service.getPostsByAuthor
+import org.sopt.sopkathon_android2.presentation.myprofile.model.toOutfitUiModel
 import org.sopt.sopkathon_android2.presentation.myprofile.model.toUiModel
 
 // 저장된 userId를 읽느라 AndroidViewModel
@@ -42,9 +45,14 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             suspendRunCatching {
-                requireNotNull(ServiceModule.apiService.getUser(userId).data)
-            }.onSuccess { profile ->
-                // 내가 만든 코디는 서버 응답에 없어 비워 둠
+                val profile = requireNotNull(ServiceModule.apiService.getUser(userId).data)
+                val createdPosts = FeedServiceModule.apiService.getPostsByAuthor(
+                    viewerId = userId,
+                    authorId = userId,
+                    postCount = profile.postCount,
+                )
+                profile to createdPosts
+            }.onSuccess { (profile, createdPosts) ->
                 _uiState.update {
                     it.copy(
                         name = profile.name,
@@ -52,6 +60,7 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
                         department = profile.department,
                         profileImageUrl = profile.profileImageUrl.orEmpty(),
                         myOutfits = profile.receivedOutfits.map { outfit -> outfit.toUiModel() },
+                        createdOutfits = createdPosts.map { post -> post.toOutfitUiModel() },
                         isLoading = false,
                     )
                 }
