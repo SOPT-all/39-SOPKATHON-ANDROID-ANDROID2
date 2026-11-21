@@ -16,9 +16,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import org.sopt.sopkathon_android2.core.common.extensions.noRippleClickable
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 
@@ -27,6 +29,7 @@ fun ColleagueSelectPersonItem(
     name: String,
     position: String,
     team: String,
+    profileImageUrl: String,
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -48,8 +51,10 @@ fun ColleagueSelectPersonItem(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // 프로필 사진은 API 연결 시 추가
-        Box(
+        AsyncImage(
+            model = profileImageUrl,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
@@ -119,6 +124,7 @@ private fun ColleagueSelectPersonItemPreview() {
                 name = "박정훈",
                 position = "부장",
                 team = "영업1팀",
+                profileImageUrl = "",
                 isSelected = true,
                 onClick = {},
             )
@@ -126,6 +132,7 @@ private fun ColleagueSelectPersonItemPreview() {
                 name = "한지민",
                 position = "부장",
                 team = "마케팅1팀",
+                profileImageUrl = "",
                 isSelected = false,
                 onClick = {},
             )

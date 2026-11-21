@@ -9,10 +9,14 @@ data class ColleagueSelectUiState(
     val selectedPosition: String = ALL_POSITION,
     val colleagues: List<ColleagueUiModel> = emptyList(),
     val selectedColleagueId: Long? = null,
+    val nextCursor: String? = null,
+    val hasMore: Boolean = false,
+    val isLoading: Boolean = false,
 ) {
-    val filteredColleagues: List<ColleagueUiModel>
-        get() = if (selectedPosition == ALL_POSITION) colleagues else colleagues.filter { it.position == selectedPosition }
-
     val selectedColleague: ColleagueUiModel?
         get() = colleagues.find { it.id == selectedColleagueId }
+}
+
+sealed interface ColleagueSelectUiEffect {
+    data object ShowErrorToast : ColleagueSelectUiEffect
 }

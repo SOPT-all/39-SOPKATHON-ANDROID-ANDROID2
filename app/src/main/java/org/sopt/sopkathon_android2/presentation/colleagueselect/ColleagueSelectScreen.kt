@@ -23,11 +23,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import org.sopt.sopkathon_android2.core.common.extensions.LoadMoreEffect
 import org.sopt.sopkathon_android2.core.common.extensions.noRippleClickable
+import org.sopt.sopkathon_android2.core.common.extensions.toast
 import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 import org.sopt.sopkathon_android2.presentation.colleagueselect.component.ColleagueSelectFilterChip
@@ -42,11 +45,21 @@ fun ColleagueSelectRoute(
     viewModel: ColleagueSelectViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                ColleagueSelectUiEffect.ShowErrorToast -> context.toast("동료 목록을 불러오지 못했어요")
+            }
+        }
+    }
 
     ColleagueSelectScreen(
         uiState = uiState,
         onPositionClick = viewModel::selectPosition,
         onColleagueClick = viewModel::toggleColleague,
+        onLoadMore = { viewModel.getColleagues() },
         onNextClick = onNextClick,
         modifier = modifier,
     )
@@ -57,10 +70,17 @@ private fun ColleagueSelectScreen(
     uiState: ColleagueSelectUiState,
     onPositionClick: (String) -> Unit,
     onColleagueClick: (Long) -> Unit,
+    onLoadMore: () -> Unit,
     onNextClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
+
+    listState.LoadMoreEffect(
+        items = uiState.colleagues,
+        isLoading = uiState.isLoading,
+        onLoadMore = onLoadMore,
+    )
 
     // 필터 변경 시 맨 위로
     LaunchedEffect(uiState.selectedPosition) {
@@ -108,11 +128,12 @@ private fun ColleagueSelectScreen(
                 // 하단 버튼에 마지막 행이 가리지 않게 여백
                 contentPadding = PaddingValues(bottom = 120.dp),
             ) {
-                items(items = uiState.filteredColleagues, key = { it.id }) { colleague ->
+                items(items = uiState.colleagues, key = { it.id }) { colleague ->
                     ColleagueSelectPersonItem(
                         name = colleague.name,
                         position = colleague.position,
                         team = colleague.team,
+                        profileImageUrl = colleague.profileImageUrl,
                         isSelected = colleague.id == uiState.selectedColleagueId,
                         onClick = { onColleagueClick(colleague.id) },
                     )
@@ -181,15 +202,16 @@ private fun ColleagueSelectScreenPreview() {
         ColleagueSelectScreen(
             uiState = ColleagueSelectUiState(
                 colleagues = listOf(
-                    ColleagueUiModel(id = 1, name = "박정훈", position = "부장", team = "영업1팀"),
-                    ColleagueUiModel(id = 2, name = "한지민", position = "부장", team = "마케팅1팀"),
-                    ColleagueUiModel(id = 3, name = "김상희", position = "차장", team = "디자인1팀"),
-                    ColleagueUiModel(id = 4, name = "위상훈", position = "사원", team = "영업3팀"),
+                    ColleagueUiModel(id = 1, name = "박정훈", position = "부장", team = "영업1팀", profileImageUrl = ""),
+                    ColleagueUiModel(id = 2, name = "한지민", position = "부장", team = "마케팅1팀", profileImageUrl = ""),
+                    ColleagueUiModel(id = 3, name = "김상희", position = "차장", team = "디자인1팀", profileImageUrl = ""),
+                    ColleagueUiModel(id = 4, name = "위상훈", position = "사원", team = "영업3팀", profileImageUrl = ""),
                 ),
                 selectedColleagueId = 1,
             ),
             onPositionClick = {},
             onColleagueClick = {},
+            onLoadMore = {},
             onNextClick = {},
         )
     }
