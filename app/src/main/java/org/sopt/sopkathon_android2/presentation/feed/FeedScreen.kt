@@ -24,6 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import org.sopt.sopkathon_android2.core.designsystem.component.LocalSopkathonSnackbarState
+import org.sopt.sopkathon_android2.core.designsystem.component.SopkathonSnackbarVisuals
 import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 import org.sopt.sopkathon_android2.presentation.feed.component.FeedHeader
@@ -41,6 +43,17 @@ fun FeedRoute(
     viewModel: FeedViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarState = LocalSopkathonSnackbarState.current
+
+    LaunchedEffect(viewModel) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                FeedUiEffect.LikeFailed -> snackbarState.show(
+                    SopkathonSnackbarVisuals(message = "좋아요를 변경하지 못했어요. 다시 시도해주세요"),
+                )
+            }
+        }
+    }
 
     LaunchedEffect(userId) {
         viewModel.setUserId(userId)

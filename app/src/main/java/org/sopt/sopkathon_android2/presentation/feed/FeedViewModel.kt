@@ -3,17 +3,24 @@ package org.sopt.sopkathon_android2.presentation.feed
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.sopt.sopkathon_android2.core.common.util.suspendRunCatching
+import org.sopt.sopkathon_android2.data.service.ApiService
 import org.sopt.sopkathon_android2.data.di.ServiceModule
 import org.sopt.sopkathon_android2.presentation.feed.component.FeedScope
 import org.sopt.sopkathon_android2.presentation.feed.model.toUiModel
 
-class FeedViewModel : ViewModel() {
+class FeedViewModel(
+    private val apiService: ApiService = ServiceModule.apiService,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(FeedUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -21,6 +28,10 @@ class FeedViewModel : ViewModel() {
     private var generation = 0
 
     private var userId: Long? = null
+    private val _uiEffect = Channel<FeedUiEffect>(Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()
+    private val likeJobs = mutableMapOf<Pair<Long, Long>, Job>()
+    private val likeStates = mutableMapOf<Pair<Long, Long>, Pair<Boolean, Int>>()
 
     fun setUserId(userId: Long?) {
         if (this.userId == userId && (_uiState.value.isLoading || _uiState.value.posts.isNotEmpty())) return
@@ -34,6 +45,8 @@ class FeedViewModel : ViewModel() {
     }
 
     fun refresh(scope: FeedScope = _uiState.value.selectedScope) {
+        // 새 조회 이전에 완료된 변경만 서버 응답으로 갱신
+        likeStates.keys.removeAll { it !in likeJobs }
         pageJob?.cancel()
         generation++
         _uiState.value = FeedUiState(selectedScope = scope)
@@ -62,8 +75,9 @@ class FeedViewModel : ViewModel() {
         _uiState.update { it.copy(isLoading = true, loadError = null) }
         pageJob = viewModelScope.launch {
             suspendRunCatching {
+                likeJobs.filterKeys { it.first == currentUserId }.values.toList().joinAll()
                 val popular = state.selectedScope == FeedScope.POPULAR
-                val response = ServiceModule.apiService.getFeed(
+                val response = apiService.getFeed(
                     userId = currentUserId,
                     sort = if (popular) "POPULAR" else "LATEST",
                     period = if (popular) "WEEK" else null,
@@ -74,7 +88,12 @@ class FeedViewModel : ViewModel() {
                 requireNotNull(response.data)
             }.onSuccess { page ->
                 if (requestGeneration != generation) return@onSuccess
-                val posts = page.items.map { it.toUiModel() }
+                val posts = page.items.map { dto ->
+                    val post = dto.toUiModel()
+                    likeStates[currentUserId to post.postId]?.let { (liked, count) ->
+                        post.copy(isLiked = liked, likeCount = count)
+                    } ?: post
+                }
                 _uiState.update {
                     it.copy(
                         posts = (if (isRefresh) posts else it.posts + posts)
@@ -97,17 +116,51 @@ class FeedViewModel : ViewModel() {
     }
 
     fun toggleLike(postId: Long) {
+        val currentUserId = userId?.takeIf { it > 0 } ?: return
+        val key = currentUserId to postId
+        if (key in likeJobs) return
+        val previous = _uiState.value.posts.find { it.postId == postId } ?: return
+        val liked = !previous.isLiked
+        val count = (previous.likeCount.toLong() + if (liked) 1 else -1)
+            .coerceIn(0, Int.MAX_VALUE.toLong()).toInt()
+        updateLike(currentUserId, postId, liked, count)
+        val job = viewModelScope.launch(start = CoroutineStart.LAZY) {
+            try {
+                suspendRunCatching {
+                    val response = if (liked) {
+                        apiService.postPostLike(currentUserId, postId)
+                    } else {
+                        apiService.deletePostLike(currentUserId, postId)
+                    }
+                    check(response.status in 200..299) { response.code }
+                    requireNotNull(response.data).also {
+                        check(it.postId == postId && it.likeCount >= 0)
+                    }
+                }.onSuccess { result ->
+                    updateLike(
+                        currentUserId, postId, result.liked,
+                        result.likeCount.coerceAtMost(Int.MAX_VALUE.toLong()).toInt(),
+                    )
+                }.onFailure { throwable ->
+                    Log.e("FeedViewModel", "좋아요 변경 실패", throwable)
+                    updateLike(currentUserId, postId, previous.isLiked, previous.likeCount)
+                    if (userId == currentUserId) _uiEffect.send(FeedUiEffect.LikeFailed)
+                }
+            } finally {
+                likeJobs.remove(key)
+            }
+        }
+        likeJobs[key] = job
+        job.start()
+    }
+
+    private fun updateLike(userId: Long, postId: Long, liked: Boolean, count: Int) {
+        likeStates[userId to postId] = liked to count
+        if (this.userId != userId) return
         _uiState.update { state ->
             state.copy(
                 posts = state.posts.map { post ->
-                    if (post.postId == postId) {
-                        post.copy(
-                            isLiked = !post.isLiked,
-                            likeCount = post.likeCount + if (post.isLiked) -1 else 1,
-                        )
-                    } else {
-                        post
-                    }
+                    if (post.postId == postId) post.copy(isLiked = liked, likeCount = count) else post
                 },
             )
         }
