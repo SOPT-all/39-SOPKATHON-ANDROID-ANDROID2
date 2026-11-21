@@ -25,16 +25,17 @@ import org.sopt.sopkathon_android2.R
 import org.sopt.sopkathon_android2.core.common.extensions.toast
 import org.sopt.sopkathon_android2.core.designsystem.component.SopkathonEmptyState
 import org.sopt.sopkathon_android2.core.designsystem.component.post.PostGridCard
+import org.sopt.sopkathon_android2.core.designsystem.component.profile.ProfileHeader
 import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 import org.sopt.sopkathon_android2.presentation.myprofile.component.MyProfileAppBar
 import org.sopt.sopkathon_android2.presentation.myprofile.component.MyProfileEditButton
-import org.sopt.sopkathon_android2.core.designsystem.component.profile.ProfileHeader
 import org.sopt.sopkathon_android2.presentation.myprofile.model.MyProfileOutfitUiModel
 
 // 3 내 프로필
 @Composable
 fun MyProfileRoute(
+    onPostClick: (Long) -> Unit,
     onCoordiClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MyProfileViewModel = viewModel(),
@@ -50,12 +51,12 @@ fun MyProfileRoute(
         }
     }
 
-    // TODO 더보기, 프로필 수정, 게시물 상세 이동은 기능 정해지면 연결
+    // TODO 더보기, 프로필 수정은 기능 정해지면 연결
     MyProfileScreen(
         uiState = uiState,
         onMoreClick = {},
         onEditClick = {},
-        onPostClick = {},
+        onPostClick = onPostClick,
         onCoordiClick = onCoordiClick,
         modifier = modifier,
     )
