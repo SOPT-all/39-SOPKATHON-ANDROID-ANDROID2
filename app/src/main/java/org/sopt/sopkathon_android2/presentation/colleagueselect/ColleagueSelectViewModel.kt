@@ -15,7 +15,7 @@ class ColleagueSelectViewModel : ViewModel() {
         _uiState.update { it.copy(selectedPosition = position, selectedColleagueId = null) }
     }
 
-    // 같은 카드를 다시 누르면 선택 해제
+    // 같은 행을 다시 누르면 선택 해제
     fun toggleColleague(colleagueId: Long) {
         _uiState.update {
             it.copy(selectedColleagueId = if (it.selectedColleagueId == colleagueId) null else colleagueId)

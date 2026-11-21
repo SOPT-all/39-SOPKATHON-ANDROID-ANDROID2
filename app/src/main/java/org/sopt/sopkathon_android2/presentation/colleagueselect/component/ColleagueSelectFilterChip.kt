@@ -53,7 +53,6 @@ fun ColleagueSelectFilterChip(
 }
 
 @Preview(showBackground = true, widthDp = 360)
-@Preview(showBackground = true, widthDp = 360, fontScale = 2f)
 @Composable
 private fun ColleagueSelectFilterChipPreview() {
     SopkathonTheme {
