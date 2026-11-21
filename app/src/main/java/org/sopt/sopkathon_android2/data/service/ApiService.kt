@@ -2,12 +2,14 @@ package org.sopt.sopkathon_android2.data.service
 
 import org.sopt.sopkathon_android2.core.network.BaseResponse
 import org.sopt.sopkathon_android2.data.dto.request.ClothesCreateRequestDto
+import org.sopt.sopkathon_android2.data.dto.request.PostCreateRequestDto
 import org.sopt.sopkathon_android2.data.dto.request.PresignedUrlRequestDto
 import org.sopt.sopkathon_android2.data.dto.request.UserCreateRequestDto
 import org.sopt.sopkathon_android2.data.dto.response.ClothesCreateResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.ClothesListResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.CursorResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.FeedItemResponseDto
+import org.sopt.sopkathon_android2.data.dto.response.PostCreateResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.PresignedUrlResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.SearchUserResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.UserCreateResponseDto
@@ -30,6 +32,12 @@ interface ApiService {
     suspend fun postClothes(
         @Body request: ClothesCreateRequestDto,
     ): BaseResponse<ClothesCreateResponseDto>
+
+    @POST("/api/v1/users/{userId}/posts")
+    suspend fun postPost(
+        @Path("userId") userId: Long,
+        @Body request: PostCreateRequestDto,
+    ): BaseResponse<PostCreateResponseDto>
 
     @POST("/api/v1/users")
     suspend fun postUser(
