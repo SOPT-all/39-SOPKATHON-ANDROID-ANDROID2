@@ -28,6 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.sopt.sopkathon_android2.R
+import org.sopt.sopkathon_android2.core.common.extensions.bringIntoViewOnFocus
 import org.sopt.sopkathon_android2.core.common.extensions.noRippleClickable
 import org.sopt.sopkathon_android2.core.designsystem.component.textfield.SopkathonBasicTextField
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
@@ -66,7 +67,7 @@ fun ProfileCreateTextField(
         fieldState = fieldState,
         helper = helper,
         counter = maxLength?.let { "${state.text.length} / $it" },
-        modifier = modifier,
+        modifier = modifier.bringIntoViewOnFocus(),
     ) {
         FieldLabel(label = label, fieldState = fieldState)
         SopkathonBasicTextField(
