@@ -16,9 +16,13 @@
 
 | 박찬미 | 공승준 | 신한서 | 정소연 |
 | :---: | :---: | :---: | :---: |
-| <img src="" width="160" /> | <img src="" width="160" /> | <img src="" width="160" /> | <img src="" width="160" /> |
+|<img width="70" alt="코디 캐릭터 5" src="https://github.com/user-attachments/assets/67b79651-c2f2-4b3c-95e5-819db109ea42" />| <img width="70" alt="코디 캐릭터 2" src="https://github.com/user-attachments/assets/76b3eb1a-7edf-4c49-9711-6f333c00a573" /> | <img width="70" alt="코디 캐릭터 3" src="https://github.com/user-attachments/assets/b67be187-d902-4e09-8ae2-8e9b4df60a90" /> | <img width="70" alt="코디 캐릭터 1" src="https://github.com/user-attachments/assets/57e0619e-f5c0-4cdc-88eb-143035b5df40" />|
 | [@chanmi1125](https://github.com/chanmi1125) | [@github-id]() | [@github-id]() | [@github-id]() |
 | 피드<br>동료 선택<br>프로필 검색<br>아이콘 삽입 | 옷 입히기<br>게시글 업로드<br>옷 드래그 + 줌인/줌아웃 | 프로필 생성<br>게시글 상세 + 바텀시트<br>이미지 누끼 | 내 프로필<br>동료 프로필<br>디자인 시스템 |
+
+
+
+
 
 <br>
 
