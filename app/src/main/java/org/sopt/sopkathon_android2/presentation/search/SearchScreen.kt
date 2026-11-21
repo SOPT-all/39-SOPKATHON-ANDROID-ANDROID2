@@ -27,7 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 import org.sopt.sopkathon_android2.presentation.search.component.PopularLookThumbnail
-import org.sopt.sopkathon_android2.presentation.search.component.PopularPostCard
+import org.sopt.sopkathon_android2.core.designsystem.component.post.PostGridCard
 import org.sopt.sopkathon_android2.presentation.search.component.SearchBarRow
 
 // 6 검색
@@ -101,7 +101,7 @@ private fun SearchScreen(
                 )
             }
             itemsIndexed(uiState.popularPosts, key = { _, post -> post.postId }) { index, post ->
-                PopularPostCard(
+                PostGridCard(
                     title = post.title,
                     imageUrl = post.imageUrl,
                     likeCount = post.likeCount,

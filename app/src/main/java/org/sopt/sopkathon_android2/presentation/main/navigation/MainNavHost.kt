@@ -131,6 +131,7 @@ fun MainNavHost(
 
         composable<MyProfile> {
             MyProfileRoute(
+                onCoordiClick = { navigator.navigateToTab(MainTab.COORDI) },
                 modifier = screenModifier,
             )
         }
