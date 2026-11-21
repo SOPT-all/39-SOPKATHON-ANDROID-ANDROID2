@@ -139,7 +139,7 @@ private fun ProfileCreateSelectBottomSheet(
             )
 
             if (searchPlaceholder != null) {
-                FieldText(
+                ProfileCreateTextField(
                     state = searchState,
                     label = "검색",
                     placeholder = searchPlaceholder,

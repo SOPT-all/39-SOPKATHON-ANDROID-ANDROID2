@@ -11,6 +11,15 @@ data object Consent : Route
 @Serializable
 data object ProfileCreate : Route
 
+// 0.3-7 가입 완료
+@Serializable
+data class SignUpComplete(
+    val name: String,
+    val department: String,
+    val rank: String,
+    val photoUri: String,
+) : Route
+
 // 1 피드 (하단 탭)
 @Serializable
 data object Feed : Route

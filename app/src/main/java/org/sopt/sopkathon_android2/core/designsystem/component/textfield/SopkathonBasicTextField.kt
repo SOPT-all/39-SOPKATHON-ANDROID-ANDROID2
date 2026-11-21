@@ -28,7 +28,7 @@ import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 /**
  * 장식 없는 기본 입력 영역
  *
- * [FieldText] 같은 텍스트 필드 UI 안에서 입력 영역으로 사용
+ * [ProfileCreateTextField] 같은 텍스트 필드 UI 안에서 입력 영역으로 사용
  *
  * @param state 텍스트, 커서, 선택 상태
  * @param isReadOnly 입력 불가, 선택·복사는 가능

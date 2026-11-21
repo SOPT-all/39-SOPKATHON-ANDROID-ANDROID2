@@ -27,10 +27,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.sopt.sopkathon_android2.core.common.extensions.clearFocusOnTap
 import org.sopt.sopkathon_android2.presentation.profilecreate.component.AppbarBack
-import org.sopt.sopkathon_android2.presentation.profilecreate.component.FieldText
+import org.sopt.sopkathon_android2.presentation.profilecreate.component.ProfileCreateTextField
 import org.sopt.sopkathon_android2.presentation.profilecreate.component.PhotoUploader
 import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
+import org.sopt.sopkathon_android2.presentation.main.navigation.SignUpComplete
 import org.sopt.sopkathon_android2.presentation.profilecreate.ProfileCreateUiState.Companion.NAME_MAX_LENGTH
 import org.sopt.sopkathon_android2.presentation.profilecreate.component.ProfileCreatePhotoBottomSheet
 import org.sopt.sopkathon_android2.presentation.profilecreate.component.ProfileCreateSaveButton
@@ -40,7 +41,7 @@ import org.sopt.sopkathon_android2.presentation.profilecreate.component.ProfileC
 @Composable
 fun ProfileCreateRoute(
     navigateUp: () -> Unit,
-    onSaveClick: () -> Unit,
+    onSaveClick: (SignUpComplete) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ProfileCreateViewModel = viewModel(),
 ) {
@@ -59,7 +60,16 @@ fun ProfileCreateRoute(
         onDepartmentSelect = viewModel::updateDepartment,
         onRankSelect = viewModel::updateRank,
         // TODO 서버 연동 시 프로필 저장 API 호출 후 이동
-        onSaveClick = onSaveClick,
+        onSaveClick = {
+            onSaveClick(
+                SignUpComplete(
+                    name = uiState.name,
+                    department = uiState.department,
+                    rank = uiState.rank,
+                    photoUri = uiState.photoUri?.toString().orEmpty(),
+                ),
+            )
+        },
         modifier = modifier,
     )
 }
@@ -133,7 +143,7 @@ private fun ProfileCreateScreen(
                 )
             }
 
-            FieldText(
+            ProfileCreateTextField(
                 state = nameState,
                 label = "이름",
                 placeholder = "이름을 입력해 주세요",
