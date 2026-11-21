@@ -1,5 +1,6 @@
 package org.sopt.sopkathon_android2.presentation.dressup.component
 
+import android.net.Uri
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,6 +33,7 @@ import org.sopt.sopkathon_android2.core.designsystem.component.StickerCanvasStat
 import org.sopt.sopkathon_android2.core.designsystem.component.rememberStickerCanvasState
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 import org.sopt.sopkathon_android2.presentation.dressup.DressUpUiState
+import org.sopt.sopkathon_android2.presentation.dressup.component.character.CharacterHead
 import org.sopt.sopkathon_android2.presentation.dressup.model.ClothesCategory
 import org.sopt.sopkathon_android2.presentation.dressup.model.WornItemUiModel
 
@@ -45,6 +47,7 @@ private val CharacterSize = DpSize(190.dp, 500.dp)
  */
 @Composable
 fun DressUpCharacter(
+    headUri: Uri?,
     wornItems: List<WornItemUiModel>,
     stickerState: StickerCanvasState,
     onItemDelete: (key: Any) -> Unit,
@@ -87,13 +90,9 @@ fun DressUpCharacter(
                 modifier = Modifier.offset(x = 152.dp, y = 293.dp),
             )
             WornItemStickers(wornItems.filter { it.category == ClothesCategory.TOP })
-            // 얼굴 누끼 연결 전 자리 표시
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .size(96.dp, 116.dp)
-                    .clip(RoundedCornerShape(48.dp))
-                    .background(SopkathonTheme.colors.coolGray200),
+            CharacterHead(
+                imageUri = headUri,
+                modifier = Modifier.align(Alignment.TopCenter),
             )
         }
     }
@@ -170,6 +169,7 @@ private fun DressUpCharacterPreview() {
     SopkathonTheme {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
             DressUpCharacter(
+                headUri = null,
                 wornItems = DressUpUiState.dummy.wornItems,
                 stickerState = rememberStickerCanvasState(),
                 onItemDelete = {},

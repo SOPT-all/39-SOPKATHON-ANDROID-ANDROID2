@@ -32,9 +32,19 @@ data object Search : Route
 @Serializable
 data object ColleagueSelect : Route
 
-// 2.2 옷 입히기
+/**
+ * 2.2 옷 입히기
+ *
+ * 2.1에서 고른 동료 정보로 앱 바 이름과 캐릭터 머리를 만듦.
+ * 2.1이 아직 colleagueId만 넘겨서 나머지는 기본값
+ */
 @Serializable
-data class DressUp(val colleagueId: Long) : Route
+data class DressUp(
+    val colleagueId: Long,
+    val name: String = "",
+    val position: String = "",
+    val profileImageUrl: String? = null,
+) : Route
 
 /**
  * 2.3 코디 게시하기

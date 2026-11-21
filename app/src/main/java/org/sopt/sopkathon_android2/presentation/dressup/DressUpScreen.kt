@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,7 +28,12 @@ import org.sopt.sopkathon_android2.presentation.dressup.component.DressUpBottomA
 import org.sopt.sopkathon_android2.presentation.dressup.component.DressUpCharacter
 import org.sopt.sopkathon_android2.presentation.dressup.component.DressUpTopBar
 import org.sopt.sopkathon_android2.presentation.dressup.component.ItemInfoBottomSheet
+import org.sopt.sopkathon_android2.presentation.dressup.component.wardrobe.WardrobeDrawer
+import org.sopt.sopkathon_android2.presentation.dressup.component.wardrobe.WardrobeDrawerContent
+import org.sopt.sopkathon_android2.presentation.dressup.component.wardrobe.model.WardrobeUiState
 import org.sopt.sopkathon_android2.presentation.dressup.model.ItemInfoInput
+import org.sopt.sopkathon_android2.presentation.main.navigation.DressUp
+import org.sopt.sopkathon_android2.presentation.main.navigation.PostUpload
 
 // 피그마에서 앱 바 아래부터 하단 버튼 줄 위까지 높이
 private val CharacterAreaHeight = 580.dp
@@ -34,29 +41,50 @@ private val CharacterAreaHeight = 580.dp
 // 2.2 옷 입히기
 @Composable
 fun DressUpRoute(
-    colleagueId: Long,
+    dressUp: DressUp,
     navigateUp: () -> Unit,
-    onCompleteClick: () -> Unit,
+    navigateToPostUpload: (PostUpload) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DressUpViewModel = viewModel(),
 ) {
-    // TODO 서버 연동 시 colleagueId로 데이터 요청
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val stickerState = rememberStickerCanvasState()
+
+    LaunchedEffect(dressUp) { viewModel.setColleague(dressUp) }
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                is DressUpUiEffect.NavigateToPostUpload -> navigateToPostUpload(effect.postUpload)
+            }
+        }
+    }
 
     DressUpScreen(
         uiState = uiState,
-        stickerState = rememberStickerCanvasState(),
+        stickerState = stickerState,
         navigateUp = navigateUp,
-        onCompleteClick = onCompleteClick,
+        onCompleteClick = { viewModel.onCompleteClick(stickerState::capture) },
         onItemDelete = viewModel::onItemDelete,
         onStickerActionClick = viewModel::onStickerActionClick,
         onPurchaseLinkClick = viewModel::onPurchaseLinkClick,
         onItemInfoSave = viewModel::onItemInfoSave,
         onItemInfoSheetDismiss = viewModel::onItemInfoSheetDismiss,
+        wardrobeDrawer = { drawerModifier ->
+            WardrobeDrawer(
+                selectedKeys = uiState.wornItems.map { it.key }.toSet(),
+                onClothesClick = viewModel::onWear,
+                onClothesAdd = viewModel::onWear,
+                modifier = drawerModifier,
+            )
+        },
         modifier = modifier,
     )
 }
 
+/**
+ * @param wardrobeDrawer 옷장 드로어. 드로어 ViewModel이 열리자마자 옷장을 조회해서 미리보기에서는 바꿔 넣음
+ */
 @Composable
 private fun DressUpScreen(
     uiState: DressUpUiState,
@@ -68,6 +96,7 @@ private fun DressUpScreen(
     onPurchaseLinkClick: () -> Unit,
     onItemInfoSave: (List<ItemInfoInput>) -> Unit,
     onItemInfoSheetDismiss: () -> Unit,
+    wardrobeDrawer: @Composable (Modifier) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -90,6 +119,7 @@ private fun DressUpScreen(
 
             // 왼쪽 옷장 폭만큼 오른쪽으로 비켜 둠 (피그마 캐릭터 x 119)
             DressUpCharacter(
+                headUri = uiState.headUri,
                 wornItems = uiState.wornItems,
                 stickerState = stickerState,
                 onItemDelete = onItemDelete,
@@ -102,6 +132,13 @@ private fun DressUpScreen(
                         scaleY = scale
                         transformOrigin = TransformOrigin(0.5f, 0f)
                     },
+            )
+            // 피그마 옷장 위치와 높이. 낮은 화면에서는 남은 높이만큼만 차지
+            wardrobeDrawer(
+                Modifier
+                    .align(Alignment.TopStart)
+                    .padding(top = 12.dp)
+                    .height(560.dp),
             )
         }
         DressUpBottomActions(
@@ -136,6 +173,17 @@ private fun DressUpScreenPreview() {
             onPurchaseLinkClick = {},
             onItemInfoSave = {},
             onItemInfoSheetDismiss = {},
+            wardrobeDrawer = { drawerModifier ->
+                WardrobeDrawerContent(
+                    uiState = WardrobeUiState.dummy,
+                    selectedKeys = emptySet(),
+                    onCategoryChange = {},
+                    onExpandedChange = {},
+                    onAddClick = {},
+                    onClothesClick = {},
+                    modifier = drawerModifier,
+                )
+            },
         )
     }
 }
