@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -62,10 +63,16 @@ fun AddClothesBottomSheet(
 
     ModalBottomSheet(
         onDismissRequest = {
-            state.discard()
-            onDismiss()
+            if (!state.isUploading) {
+                state.discard()
+                onDismiss()
+            }
         },
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        // 업로드 중에 닫히면 요청이 취소돼 서버에만 옷이 생길 수 있어 닫히지 않게 함
+        sheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = true,
+            confirmValueChange = { it != SheetValue.Hidden || !state.isUploading },
+        ),
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
         containerColor = SopkathonTheme.colors.coolGray50,
         scrimColor = SheetScrimColor,

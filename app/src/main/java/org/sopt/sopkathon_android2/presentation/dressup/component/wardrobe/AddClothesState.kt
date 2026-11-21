@@ -8,8 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.FileProvider
@@ -37,10 +38,14 @@ private const val CAMERA_DIRECTORY = "camera"
 internal class AddClothesState(
     context: Context,
     private val scope: CoroutineScope,
+    cameraFilePath: String? = null,
 ) {
     private val context = context.applicationContext
     private val processor = ClothingCutoutProcessor(this.context)
-    private var cameraFile: File? = null
+    private var cameraFile: File? = cameraFilePath?.let(::File)
+
+    val cameraFilePath: String?
+        get() = cameraFile?.path
 
     val nameState = TextFieldState()
 
@@ -190,5 +195,11 @@ internal class AddClothesState(
 internal fun rememberAddClothesState(): AddClothesState {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    return remember(context, scope) { AddClothesState(context, scope) }
+    // 카메라 앱에 다녀오는 사이 Activity가 다시 만들어져도 찍은 사진 경로를 잃지 않게 저장
+    return rememberSaveable(
+        saver = Saver(
+            save = { it.cameraFilePath },
+            restore = { path -> AddClothesState(context, scope, path) },
+        ),
+    ) { AddClothesState(context, scope) }
 }
