@@ -141,6 +141,132 @@ class XxxViewModel(application: Application) : AndroidViewModel(application) {
 }
 ```
 
+## Cursor Paging
+
+List APIs page with a cursor. Send `cursor` (`null` for the first page) and `limit`. The response `data` is `CursorResponseDto<T>`: `items`, `nextCursor`, `hasMore`. The last page has `nextCursor = null` and `hasMore = false`.
+
+| API | Note |
+| --- | --- |
+| `GET /api/v1/users/{userId}/feed` | `sort`: `LATEST` or `POPULAR` |
+| `GET /api/v1/users/{userId}/posts/{postId}/comments` | `X-User-Id` header required |
+| `GET /api/v1/users` | Never call with an empty `keyword` (400 `INVALID_KEYWORD`) |
+
+| Step | File | Add |
+| --- | --- | --- |
+| 1 | `data/dto/response/XxxResponseDto.kt` | One element of `items` |
+| 2 | `data/service/ApiService.kt` | `cursor`, `limit` queries, returning `BaseResponse<CursorResponseDto<XxxResponseDto>>` |
+| 3 | `XxxContract.kt` | `items`, `nextCursor`, `hasMore`, `isLoading` in UiState |
+| 4 | `XxxViewModel.kt` | `getXxxList(isRefresh)` (search: [Search](#search)) |
+| 5 | `XxxScreen.kt` | `LoadMoreEffect` on the state of the `LazyColumn` or `LazyVerticalGrid` |
+
+```kotlin
+// ApiService
+@GET("/api/v1/xxx")
+suspend fun getXxxList(
+    @Query("cursor") cursor: String?, // null이면 쿼리에서 빠짐
+    @Query("limit") limit: Int,
+): BaseResponse<CursorResponseDto<XxxResponseDto>>
+```
+
+```kotlin
+// XxxContract
+data class XxxUiState(
+    val items: List<XxxUiModel> = emptyList(),
+    val nextCursor: String? = null,
+    val hasMore: Boolean = false,
+    val isLoading: Boolean = false,
+)
+```
+
+```kotlin
+// XxxViewModel
+init {
+    getXxxList(isRefresh = true)
+}
+
+fun getXxxList(isRefresh: Boolean = false) {
+    val state = _uiState.value
+    if (state.isLoading) return // 연타, 요청 중 새로고침 무시
+    if (!isRefresh && !state.hasMore) return // 마지막 페이지 뒤 요청 방지
+
+    viewModelScope.launch {
+        _uiState.update { it.copy(isLoading = true) }
+
+        suspendRunCatching {
+            requireNotNull(
+                ServiceModule.apiService.getXxxList(
+                    cursor = if (isRefresh) null else state.nextCursor,
+                    limit = PAGE_SIZE,
+                ).data,
+            )
+        }.onSuccess { page ->
+            val newItems = page.items.map { it.toUiModel() }
+            _uiState.update {
+                it.copy(
+                    // 인기순처럼 순서가 바뀌는 목록에서 같은 항목이 두 페이지에 와도 key 중복 크래시 방지
+                    items = (if (isRefresh) newItems else it.items + newItems).distinctBy { item -> item.id },
+                    nextCursor = page.nextCursor,
+                    hasMore = page.hasMore,
+                    isLoading = false,
+                )
+            }
+        }.onFailure { throwable ->
+            Log.e("XxxViewModel", "목록 조회 실패", throwable)
+            _uiState.update { it.copy(isLoading = false) }
+            _uiEffect.send(XxxUiEffect.ShowErrorToast)
+        }
+    }
+}
+
+companion object {
+    private const val PAGE_SIZE = 20
+}
+```
+
+```kotlin
+// XxxScreen
+val listState = rememberLazyListState()
+
+LazyColumn(state = listState) {
+    items(items = uiState.items, key = { it.id }) { item ->
+        XxxItem(item = item)
+    }
+}
+
+listState.LoadMoreEffect(
+    items = uiState.items,
+    isLoading = uiState.isLoading,
+    onLoadMore = onLoadMore, // Route에서 { viewModel.getXxxList() }
+)
+```
+
+A grid uses `rememberLazyGridState()`, `LazyVerticalGrid(state = gridState)`, and `gridState.LoadMoreEffect(...)` with the same arguments.
+
+| Rule | Why |
+| --- | --- |
+| Pass only the server `items`, not headers or a loading item | `LoadMoreEffect` calls `onLoadMore` once per `items`. After a failure `items` stays the same, so it waits until the user scrolls away and back instead of retrying in a loop |
+| Default `threshold` is 20 (one page) | The next page arrives before the user reaches the end. The second page is requested right after the first one shows |
+| Give the screen a retry (button or pull to refresh) that calls `getXxxList(isRefresh = true)` | `LoadMoreEffect` never loads the first page, so a failed first page stays empty |
+
+### Search
+
+A new keyword has to replace a request that is still running, so search cancels the previous `Job` instead of ignoring the call.
+
+```kotlin
+// SearchViewModel
+private var searchJob: Job? = null
+
+fun searchXxx(isRefresh: Boolean = false) {
+    val state = _uiState.value
+    if (!isRefresh && (state.isLoading || !state.hasMore)) return // 새 검색어는 요청 중이어도 진행
+
+    searchJob?.cancel() // 이전 검색어 응답이 새 결과를 덮는 것 방지
+    searchJob = viewModelScope.launch {
+        // getXxxList의 launch 블록과 같음
+    }
+}
+```
+
 ## Don't / Do
 
 | Don't | Do |

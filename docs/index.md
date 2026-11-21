@@ -4,6 +4,7 @@
 | --- | --- |
 | New screen, ViewModel, UiState, UiEffect, navigation | [screen](screen.md) |
 | API, DTO, error handling | [network](network.md) |
+| List paging, infinite scroll | [network](network.md#cursor-paging) |
 | Composable, naming, design tokens, Figma values, Preview | [compose](compose.md) |
 
 ## Package
