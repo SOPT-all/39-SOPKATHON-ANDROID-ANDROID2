@@ -83,6 +83,12 @@ class FeedLikeTest {
         var deletes = 0
         var result = CompletableDeferred<BaseResponse<PostLikeResponseDto>>()
 
+        override suspend fun getClothes(): BaseResponse<org.sopt.sopkathon_android2.data.dto.response.ClothesListResponseDto> = error("Unused")
+
+        override suspend fun postPresignedUrl(request: org.sopt.sopkathon_android2.data.dto.request.PresignedUrlRequestDto): BaseResponse<org.sopt.sopkathon_android2.data.dto.response.PresignedUrlResponseDto> = error("Unused")
+
+        override suspend fun postClothes(request: org.sopt.sopkathon_android2.data.dto.request.ClothesCreateRequestDto): BaseResponse<org.sopt.sopkathon_android2.data.dto.response.ClothesCreateResponseDto> = error("Unused")
+
         override suspend fun getFeed(userId: Long, sort: String, period: String?, limit: Int, cursor: String?) =
             BaseResponse(200, "OK", "", CursorResponseDto(
                 items = listOf(FeedPostResponseDto(
