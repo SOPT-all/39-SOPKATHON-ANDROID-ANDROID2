@@ -7,6 +7,10 @@ import org.sopt.sopkathon_android2.presentation.feed.model.FeedPostUiModel
 data class FeedUiState(
     val selectedScope: FeedScope = FeedScope.DEPARTMENT,
     val posts: List<FeedPostUiModel> = emptyList(),
+    val nextCursor: String? = null,
+    val hasMore: Boolean = false,
+    val isLoading: Boolean = false,
+    val loadError: String? = null,
 ) {
     companion object {
         val dummy = FeedUiState(

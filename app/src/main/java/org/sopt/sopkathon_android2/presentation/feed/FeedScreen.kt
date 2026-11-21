@@ -9,6 +9,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import org.sopt.sopkathon_android2.core.common.extensions.LoadMoreEffect
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,6 +47,8 @@ fun FeedRoute(
     FeedScreen(
         uiState = uiState,
         onScopeClick = viewModel::selectScope,
+        onLoadMore = viewModel::loadMore,
+        onRetry = viewModel::retry,
         onLikeClick = viewModel::toggleLike,
         onColleagueClick = onColleagueClick,
         onPostClick = onPostClick,
@@ -54,6 +64,8 @@ fun FeedRoute(
 private fun FeedScreen(
     uiState: FeedUiState,
     onScopeClick: (FeedScope) -> Unit,
+    onLoadMore: () -> Unit,
+    onRetry: () -> Unit,
     onLikeClick: (Long) -> Unit,
     onColleagueClick: (Long) -> Unit,
     onPostClick: (Long) -> Unit,
@@ -63,6 +75,17 @@ private fun FeedScreen(
     onShareClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val listState = rememberLazyListState()
+    LaunchedEffect(uiState.selectedScope) {
+        listState.scrollToItem(0)
+    }
+    listState.LoadMoreEffect(
+        items = uiState.posts.map { it.postId },
+        isLoading = uiState.isLoading,
+        threshold = 3,
+        onLoadMore = onLoadMore,
+    )
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -70,6 +93,7 @@ private fun FeedScreen(
     ) {
         FeedHeader(onNotificationClick = onNotificationClick)
         LazyColumn(
+            state = listState,
             modifier = Modifier.weight(1f),
             contentPadding = PaddingValues(bottom = 24.dp),
         ) {
@@ -113,6 +137,28 @@ private fun FeedScreen(
                 )
                 Spacer(modifier = Modifier.height(20.dp))
             }
+            item(key = "pageStatus") {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    when {
+                        uiState.isLoading -> CircularProgressIndicator(
+                            color = SopkathonTheme.colors.coolGray950,
+                        )
+                        uiState.loadError != null -> Column {
+                            Text(text = uiState.loadError)
+                            TextButton(onClick = onRetry) { Text(text = "다시 시도") }
+                        }
+                        uiState.posts.isEmpty() -> Text(text = "아직 게시글이 없어요")
+                        !uiState.hasMore -> Text(
+                            text = "모든 게시글을 확인했어요",
+                            style = SopkathonTheme.typography.caption,
+                            color = SopkathonTheme.colors.coolGray500,
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -124,6 +170,8 @@ private fun FeedScreenPreview() {
         FeedScreen(
             uiState = FeedUiState.dummy,
             onScopeClick = {},
+            onLoadMore = {},
+            onRetry = {},
             onLikeClick = {},
             onColleagueClick = {},
             onPostClick = {},
