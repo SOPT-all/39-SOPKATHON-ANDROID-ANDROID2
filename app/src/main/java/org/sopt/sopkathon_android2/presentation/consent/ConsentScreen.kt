@@ -2,7 +2,6 @@ package org.sopt.sopkathon_android2.presentation.consent
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.sopt.sopkathon_android2.R
+import org.sopt.sopkathon_android2.core.common.extensions.noRippleClickable
 import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 import org.sopt.sopkathon_android2.presentation.consent.component.ConsentCheckRow
@@ -186,7 +186,7 @@ private fun ConsentStartButton(
             .height(56.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(if (isEnabled) SopkathonTheme.colors.coolGray950 else SopkathonTheme.colors.coolGray150)
-            .clickable(enabled = isEnabled, onClick = onClick),
+            .noRippleClickable(enabled = isEnabled, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Text(
@@ -206,7 +206,7 @@ private fun ConsentSkipButton(
         modifier = modifier
             .fillMaxWidth()
             .height(40.dp)
-            .clickable(onClick = onClick),
+            .noRippleClickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Text(
