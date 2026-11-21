@@ -1,6 +1,7 @@
 package org.sopt.sopkathon_android2.presentation.main.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -18,7 +19,9 @@ fun MainNavHost(
     NavHost(
         navController = navigator.navController,
         startDestination = Home,
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .consumeWindowInsets(paddingValues), // 키보드 올라올 때 하단 패딩 소비
     ) {
         composable<Home> {
             HomeRoute(
