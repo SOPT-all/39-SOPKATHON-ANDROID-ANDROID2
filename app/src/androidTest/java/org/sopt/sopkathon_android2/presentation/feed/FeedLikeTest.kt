@@ -12,7 +12,7 @@ import org.sopt.sopkathon_android2.data.dto.response.CursorResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.FeedPostResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.FeedUserResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.PostLikeResponseDto
-import org.sopt.sopkathon_android2.data.service.ApiService
+import org.sopt.sopkathon_android2.data.service.FeedApiService
 
 class FeedLikeTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
@@ -77,15 +77,14 @@ class FeedLikeTest {
         }
     }
 
-    private class LikeApi(private val initialLiked: Boolean = false) : ApiService {
+    private class LikeApi(private val initialLiked: Boolean = false) : FeedApiService {
         var reads = 0
         var posts = 0
         var deletes = 0
         var result = CompletableDeferred<BaseResponse<PostLikeResponseDto>>()
 
-        override suspend fun getPostDetail(userId: Long, postId: Long): org.sopt.sopkathon_android2.core.network.BaseResponse<org.sopt.sopkathon_android2.data.dto.response.PostDetailResponseDto> = error("Unused")
-        override suspend fun getPostComments(userId: Long, postId: Long, cursor: String?, limit: Int, requesterId: Long): org.sopt.sopkathon_android2.core.network.BaseResponse<org.sopt.sopkathon_android2.data.dto.response.CursorResponseDto<org.sopt.sopkathon_android2.data.dto.response.CommentResponseDto>> = error("Unused")
-        override suspend fun postPostComment(userId: Long, postId: Long, request: org.sopt.sopkathon_android2.data.dto.request.CommentCreateRequestDto, requesterId: Long): org.sopt.sopkathon_android2.core.network.BaseResponse<org.sopt.sopkathon_android2.data.dto.response.CommentCreateResponseDto> = error("Unused")
+
+
 
         override suspend fun getFeed(userId: Long, sort: String, period: String?, limit: Int, cursor: String?) =
             BaseResponse(200, "OK", "", CursorResponseDto(

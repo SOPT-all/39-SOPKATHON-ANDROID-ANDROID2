@@ -79,6 +79,7 @@ fun MainNavHost(
                 userId = 3L,
                 onColleagueClick = navController::navigateToColleagueProfile,
                 onPostClick = navController::navigateToPostDetail,
+                onCreateOutfitClick = navController::navigateToColleagueSelect,
                 modifier = screenModifier,
             )
         }

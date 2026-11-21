@@ -1,62 +1,30 @@
 package org.sopt.sopkathon_android2.data.service
 
 import org.sopt.sopkathon_android2.core.network.BaseResponse
-import org.sopt.sopkathon_android2.data.dto.response.CursorResponseDto
-import org.sopt.sopkathon_android2.data.dto.response.FeedPostResponseDto
-import org.sopt.sopkathon_android2.data.dto.response.PostLikeResponseDto
-import retrofit2.http.DELETE
-import retrofit2.http.POST
-import org.sopt.sopkathon_android2.data.dto.response.PostDetailResponseDto
-import org.sopt.sopkathon_android2.data.dto.response.CommentResponseDto
-import org.sopt.sopkathon_android2.data.dto.response.CommentCreateResponseDto
-import org.sopt.sopkathon_android2.data.dto.request.CommentCreateRequestDto
-import retrofit2.http.Header
+import org.sopt.sopkathon_android2.data.dto.request.ClothesCreateRequestDto
+import org.sopt.sopkathon_android2.data.dto.request.PresignedUrlRequestDto
+import org.sopt.sopkathon_android2.data.dto.response.ClothesCreateResponseDto
+import org.sopt.sopkathon_android2.data.dto.response.ClothesListResponseDto
+import org.sopt.sopkathon_android2.data.dto.response.PresignedUrlResponseDto
 import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
+import retrofit2.http.POST
 
 interface ApiService {
-    @GET("api/v1/users/{userId}/feed")
-    suspend fun getFeed(
-        @Path("userId") userId: Long,
-        @Query("sort") sort: String = "LATEST",
-        @Query("period") period: String? = null,
-        @Query("limit") limit: Int = 20,
-        @Query("cursor") cursor: String? = null,
-    ): BaseResponse<CursorResponseDto<FeedPostResponseDto>>
-    @POST("api/v1/users/{userId}/posts/{postId}/like")
-    suspend fun postPostLike(
-        @Path("userId") userId: Long,
-        @Path("postId") postId: Long,
-    ): BaseResponse<PostLikeResponseDto>
+    // 서버 API 나오면 여기에 추가
+    // @GET("/api/v1/...")
+    // suspend fun getXxx(): BaseResponse<XxxResponseDto>
 
-    @DELETE("api/v1/users/{userId}/posts/{postId}/like")
-    suspend fun deletePostLike(
-        @Path("userId") userId: Long,
-        @Path("postId") postId: Long,
-    ): BaseResponse<PostLikeResponseDto>
+    @GET("/api/v1/clothes")
+    suspend fun getClothes(): BaseResponse<ClothesListResponseDto>
 
-    @GET("api/v1/users/{userId}/posts/{postId}")
-    suspend fun getPostDetail(
-        @Path("userId") userId: Long,
-        @Path("postId") postId: Long,
-    ): BaseResponse<PostDetailResponseDto>
+    @POST("/api/v1/presigned-url")
+    suspend fun postPresignedUrl(
+        @Body request: PresignedUrlRequestDto,
+    ): BaseResponse<PresignedUrlResponseDto>
 
-    @GET("api/v1/users/{userId}/posts/{postId}/comments")
-    suspend fun getPostComments(
-        @Path("userId") userId: Long,
-        @Path("postId") postId: Long,
-        @Query("cursor") cursor: String? = null,
-        @Query("limit") limit: Int = 20,
-        @Header("X-User-Id") requesterId: Long = userId,
-    ): BaseResponse<CursorResponseDto<CommentResponseDto>>
-
-    @POST("api/v1/users/{userId}/posts/{postId}/comments")
-    suspend fun postPostComment(
-        @Path("userId") userId: Long,
-        @Path("postId") postId: Long,
-        @Body request: CommentCreateRequestDto,
-        @Header("X-User-Id") requesterId: Long = userId,
-    ): BaseResponse<CommentCreateResponseDto>
+    @POST("/api/v1/clothes")
+    suspend fun postClothes(
+        @Body request: ClothesCreateRequestDto,
+    ): BaseResponse<ClothesCreateResponseDto>
 }

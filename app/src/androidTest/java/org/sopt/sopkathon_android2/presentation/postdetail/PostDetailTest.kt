@@ -9,7 +9,7 @@ import org.sopt.sopkathon_android2.core.designsystem.component.post.OutfitItemTy
 import org.sopt.sopkathon_android2.core.network.BaseResponse
 import org.sopt.sopkathon_android2.data.dto.request.CommentCreateRequestDto
 import org.sopt.sopkathon_android2.data.dto.response.*
-import org.sopt.sopkathon_android2.data.service.ApiService
+import org.sopt.sopkathon_android2.data.service.PostDetailApiService
 import java.lang.reflect.Proxy
 
 class PostDetailTest {
@@ -94,7 +94,7 @@ class PostDetailTest {
         try { block(vm) } finally { instrumentation.runOnMainSync { store.clear() } }
     }
 
-    private class DetailApi : ApiService by unusedApi() {
+    private class DetailApi : PostDetailApiService by unusedApi() {
         var reads = 0
         var writes = 0
         var likes = 0
@@ -132,6 +132,6 @@ class PostDetailTest {
     }
 }
 
-private fun unusedApi(): ApiService = Proxy.newProxyInstance(
-    ApiService::class.java.classLoader, arrayOf(ApiService::class.java),
-) { _, method, _ -> error("Unexpected API: ${method.name}") } as ApiService
+private fun unusedApi(): PostDetailApiService = Proxy.newProxyInstance(
+    PostDetailApiService::class.java.classLoader, arrayOf(PostDetailApiService::class.java),
+) { _, method, _ -> error("Unexpected API: ${method.name}") } as PostDetailApiService

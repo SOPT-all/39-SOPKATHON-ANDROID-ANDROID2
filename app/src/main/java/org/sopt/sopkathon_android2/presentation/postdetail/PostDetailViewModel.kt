@@ -13,13 +13,13 @@ import kotlinx.coroutines.launch
 import org.sopt.sopkathon_android2.core.common.util.suspendRunCatching
 import org.sopt.sopkathon_android2.core.designsystem.component.post.OutfitItemType
 import org.sopt.sopkathon_android2.core.network.BaseResponse
-import org.sopt.sopkathon_android2.data.di.ServiceModule
+import org.sopt.sopkathon_android2.data.di.PostDetailServiceModule
 import org.sopt.sopkathon_android2.data.dto.request.CommentCreateRequestDto
-import org.sopt.sopkathon_android2.data.service.ApiService
+import org.sopt.sopkathon_android2.data.service.PostDetailApiService
 import org.sopt.sopkathon_android2.presentation.postdetail.model.toUiModel
 
 class PostDetailViewModel(
-    private val api: ApiService = ServiceModule.apiService,
+    private val api: PostDetailApiService = PostDetailServiceModule.apiService,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PostDetailUiState())
     val uiState = _uiState.asStateFlow()

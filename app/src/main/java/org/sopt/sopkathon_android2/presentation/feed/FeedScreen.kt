@@ -28,6 +28,7 @@ import org.sopt.sopkathon_android2.core.designsystem.component.LocalSopkathonSna
 import org.sopt.sopkathon_android2.core.designsystem.component.SopkathonSnackbarVisuals
 import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
+import org.sopt.sopkathon_android2.presentation.feed.component.FeedEmptyState
 import org.sopt.sopkathon_android2.presentation.feed.component.FeedHeader
 import org.sopt.sopkathon_android2.presentation.feed.component.FeedPostSection
 import org.sopt.sopkathon_android2.presentation.feed.component.FeedScope
@@ -39,6 +40,7 @@ fun FeedRoute(
     userId: Long?,
     onColleagueClick: (Long) -> Unit,
     onPostClick: (Long) -> Unit,
+    onCreateOutfitClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FeedViewModel = viewModel(),
 ) {
@@ -67,6 +69,7 @@ fun FeedRoute(
         onLikeClick = viewModel::toggleLike,
         onColleagueClick = onColleagueClick,
         onPostClick = onPostClick,
+        onCreateOutfitClick = onCreateOutfitClick,
         onNotificationClick = { },
         onTeamLookClick = { },
         onMoreClick = { },
@@ -84,6 +87,7 @@ private fun FeedScreen(
     onLikeClick: (Long) -> Unit,
     onColleagueClick: (Long) -> Unit,
     onPostClick: (Long) -> Unit,
+    onCreateOutfitClick: () -> Unit,
     onNotificationClick: () -> Unit,
     onTeamLookClick: () -> Unit,
     onMoreClick: () -> Unit,
@@ -154,7 +158,12 @@ private fun FeedScreen(
             }
             item(key = "pageStatus") {
                 Box(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    modifier = Modifier.fillMaxWidth()
+                        .then(
+                            if (uiState.posts.isEmpty() && !uiState.isLoading && uiState.loadError == null)
+                                Modifier.fillParentMaxHeight(0.72f) else Modifier,
+                        )
+                        .padding(16.dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     when {
@@ -165,7 +174,7 @@ private fun FeedScreen(
                             Text(text = uiState.loadError)
                             TextButton(onClick = onRetry) { Text(text = "다시 시도") }
                         }
-                        uiState.posts.isEmpty() -> Text(text = "아직 게시글이 없어요")
+                        uiState.posts.isEmpty() -> FeedEmptyState(onCreateOutfitClick = onCreateOutfitClick)
                         !uiState.hasMore -> Text(
                             text = "모든 게시글을 확인했어요",
                             style = SopkathonTheme.typography.caption,
@@ -190,6 +199,7 @@ private fun FeedScreenPreview() {
             onLikeClick = {},
             onColleagueClick = {},
             onPostClick = {},
+            onCreateOutfitClick = {},
             onNotificationClick = {},
             onTeamLookClick = {},
             onMoreClick = {},

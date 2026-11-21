@@ -11,7 +11,7 @@ import org.junit.Assert.*
 import org.junit.Test
 import org.sopt.sopkathon_android2.data.dto.request.CommentCreateRequestDto
 import org.sopt.sopkathon_android2.data.dto.response.PostDetailResponseDto
-import org.sopt.sopkathon_android2.data.service.ApiService
+import org.sopt.sopkathon_android2.data.service.PostDetailApiService
 import org.sopt.sopkathon_android2.presentation.postdetail.model.toUiModel
 import org.sopt.sopkathon_android2.presentation.postdetail.model.toWebUrlOrNull
 import retrofit2.Retrofit
@@ -60,7 +60,7 @@ class PostDetailApiTest {
                 .body("""{"status":200,"code":"OK","message":"ok","data":$data}""".toResponseBody("application/json".toMediaType())).build()
         }.build()
         val api = Retrofit.Builder().baseUrl("https://example.com/").client(client)
-            .addConverterFactory(Json.asConverterFactory("application/json".toMediaType())).build().create(ApiService::class.java)
+            .addConverterFactory(Json.asConverterFactory("application/json".toMediaType())).build().create(PostDetailApiService::class.java)
         assertFalse(api.getPostComments(1, 501, "cursor+/=").data!!.hasMore)
         assertEquals(4, api.postPostComment(1, 501, CommentCreateRequestDto("댓글")).data!!.commentCount)
         assertEquals(listOf("GET", "POST"), methods)
