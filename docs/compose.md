@@ -52,8 +52,11 @@ fun PostCard(
 | --- | --- |
 | Click without ripple | `Modifier.noRippleClickable { }` |
 | Image from URL | Coil `AsyncImage(model = url, contentDescription = null)` |
-| Status / navigation bar padding | Already applied: `MainNavHost` passes Scaffold `paddingValues`. Don't add `statusBarsPadding()` again |
+| Status / navigation bar padding | Already applied: `MainNavHost` passes Scaffold `paddingValues` (with the bottom bar height). Don't add `statusBarsPadding()`, `navigationBarsPadding()`, `systemBarsPadding()` in screens or in `ModalBottomSheet` content (the sheet pads its content) |
+| System bar icon color | Set once in `MainActivity` `enableEdgeToEdge()` (dark icons, transparent bars). Don't change it in screens |
+| Screen background other than white | In `MainNavHost`, `Modifier.background(color).then(screenModifier)` so the color fills behind the system bars |
 | Text input screen | `imePadding()` + `verticalScroll(rememberScrollState())`, `clearFocusOnTap()` on the root |
+| Text field in a scroll area | `Modifier.bringIntoViewOnFocus()` on the field's outer layout. Keeps the whole field and helper text above the keyboard, not only the cursor line |
 | Input at the bottom of the scroll area | Add `scrollToEndOnFocus(scrollState)` before `verticalScroll(scrollState)`. Not when inputs are in the middle |
 | Character count, max length | `text.graphemeLength()`, not `length` (이모지를 1자로 셈) |
 | Crop an image | `ImageCropper(imageUri, aspectRatio, state = cropperState)` with `rememberImageCropperState()`. On the confirm button (enabled when `cropperState.isLoaded`), call `cropperState.crop()`. It gives a PNG `Uri` in the cache, so a cutout keeps its transparent background. Delete it after upload |
