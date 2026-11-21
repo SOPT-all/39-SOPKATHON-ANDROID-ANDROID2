@@ -118,15 +118,18 @@ fun ImageCropper(
     val density = LocalDensity.current
     val paint = remember { Paint(Paint.FILTER_BITMAP_FLAG) }
 
+    LaunchedEffect(state, imageUri) {
+        state.geometry = null
+        state.bitmap = imageUri?.let { context.loadCropBitmap(it) }
+    }
+
     BoxWithConstraints(modifier = modifier.clipToBounds()) {
         val bounds = with(density) {
             Rect(0f, 0f, maxWidth.toPx(), maxHeight.toPx()).deflate(CropAreaPadding.toPx())
         }
-        LaunchedEffect(state, imageUri, bounds, aspectRatio) {
-            state.geometry = null
-            val image = imageUri?.let { context.loadCropBitmap(it) } ?: return@LaunchedEffect
-            state.bitmap = image
-            state.geometry = CropGeometry.initial(bounds, aspectRatio, Size(image.width.toFloat(), image.height.toFloat()))
+        val bitmap = state.bitmap
+        LaunchedEffect(bitmap, bounds, aspectRatio) {
+            state.geometry = bitmap?.let { CropGeometry.initial(bounds, aspectRatio, Size(it.width.toFloat(), it.height.toFloat())) }
         }
 
         Canvas(
@@ -208,7 +211,7 @@ internal data class CropGeometry(
     }
 }
 
-// 픽셀을 읽어 잘라야 해서 하드웨어 비트맵을 끔
+// 소프트웨어 Canvas에 그려 잘라야 해서 하드웨어 비트맵을 끔
 private suspend fun Context.loadCropBitmap(uri: Uri): Bitmap? {
     val request = ImageRequest.Builder(this)
         .data(uri)
