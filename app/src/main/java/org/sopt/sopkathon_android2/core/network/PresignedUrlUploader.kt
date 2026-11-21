@@ -31,8 +31,11 @@ import kotlin.math.min
  * 업로드 순서와 ViewModel 예시는 docs/network.md의 Image Upload
  */
 object PresignedUrlUploader {
-    /** presigned URL을 요청할 때 보낼 Content-Type (이미지는 항상 JPEG로 바꿔 올림) */
+    /** [upload]용 presigned URL을 요청할 때 보낼 Content-Type (JPEG로 바꿔 올림) */
     const val CONTENT_TYPE = "image/jpeg"
+
+    /** [uploadPng]용 presigned URL을 요청할 때 보낼 Content-Type */
+    const val PNG_CONTENT_TYPE = "image/png"
 
     private const val MAX_SIZE = 1920
     private const val JPEG_QUALITY = 80
@@ -51,9 +54,27 @@ object PresignedUrlUploader {
      */
     suspend fun upload(context: Context, presignedUrl: String, uri: Uri) {
         val bytes = withContext(Dispatchers.IO) { compress(context.contentResolver, uri) }
+        put(presignedUrl, bytes, CONTENT_TYPE)
+    }
+
+    /**
+     * PNG를 바꾸지 않고 presigned URL에 PUT 하는 함수
+     *
+     * JPEG로 바꾸면 투명한 곳이 사라져서 캡처, 누끼 이미지는 이 함수로 올림
+     *
+     * @param uri `StickerCanvasState.capture()`로 저장한 PNG
+     */
+    suspend fun uploadPng(context: Context, presignedUrl: String, uri: Uri) {
+        val bytes = withContext(Dispatchers.IO) {
+            context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: throw IOException("이미지를 읽을 수 없음")
+        }
+        put(presignedUrl, bytes, PNG_CONTENT_TYPE)
+    }
+
+    private suspend fun put(presignedUrl: String, bytes: ByteArray, contentType: String) {
         val request = Request.Builder()
             .url(presignedUrl)
-            .put(bytes.toRequestBody(CONTENT_TYPE.toMediaType()))
+            .put(bytes.toRequestBody(contentType.toMediaType()))
             .build()
         client.newCall(request).await()
     }
