@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.sopt.sopkathon_android2.core.common.util.suspendRunCatching
+import org.sopt.sopkathon_android2.data.di.ServiceModule
 import org.sopt.sopkathon_android2.presentation.dressup.component.character.CharacterHeadMaker
 import org.sopt.sopkathon_android2.presentation.dressup.component.wardrobe.model.WardrobeClothes
 import org.sopt.sopkathon_android2.presentation.dressup.model.ClothesCategory
@@ -36,9 +37,36 @@ class DressUpViewModel(application: Application) : AndroidViewModel(application)
     val uiEffect: Flow<DressUpUiEffect> = _uiEffect.receiveAsFlow()
 
     fun setColleague(dressUp: DressUp) {
+        if (dressUp.name.isBlank()) {
+            loadColleague(dressUp.colleagueId)
+            return
+        }
+        applyColleague(dressUp)
+    }
+
+    private fun applyColleague(dressUp: DressUp) {
         colleague = dressUp
         _uiState.update { it.copy(colleagueName = "${dressUp.name} ${dressUp.position}".trim()) }
         dressUp.profileImageUrl?.let(::makeCharacterHead)
+    }
+
+    // 게시물 상세 '입혀보기'처럼 id만 넘어온 경우 동료 정보 조회
+    private fun loadColleague(colleagueId: Long) {
+        colleague = DressUp(colleagueId)
+        viewModelScope.launch {
+            suspendRunCatching { requireNotNull(ServiceModule.apiService.getUser(colleagueId).data) }
+                .onSuccess { user ->
+                    applyColleague(
+                        DressUp(
+                            colleagueId = colleagueId,
+                            name = user.name.trim(),
+                            position = user.position.trim(),
+                            profileImageUrl = user.profileImageUrl?.ifBlank { null },
+                        ),
+                    )
+                }
+                .onFailure { Log.e(TAG, "동료 정보 조회 실패", it) }
+        }
     }
 
     private fun makeCharacterHead(profileImageUrl: String) {
