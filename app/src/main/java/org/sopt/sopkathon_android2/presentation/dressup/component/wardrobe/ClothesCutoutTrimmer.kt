@@ -5,6 +5,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.net.Uri
+import coil3.size.Size
+import coil3.transform.Transformation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -22,8 +24,7 @@ internal object ClothesCutoutTrimmer {
             requireNotNull(BitmapFactory.decodeStream(input)) { "Cutout decode failed" }
         }
         try {
-            val bounds = source.paddedOpaqueBounds()
-            val trimmed = Bitmap.createBitmap(source, bounds.left, bounds.top, bounds.width(), bounds.height())
+            val trimmed = trim(source)
             try {
                 val file = File.createTempFile("clothes-cutout-", ".png", context.cacheDir)
                 file.outputStream().use { output ->
@@ -36,6 +37,12 @@ internal object ClothesCutoutTrimmer {
         } finally {
             source.recycle()
         }
+    }
+
+    // 여백이 없으면 받은 비트맵을 그대로 돌려줌
+    fun trim(bitmap: Bitmap): Bitmap {
+        val bounds = bitmap.paddedOpaqueBounds()
+        return Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.width(), bounds.height())
     }
 
     private fun Bitmap.paddedOpaqueBounds(): Rect {
@@ -65,4 +72,11 @@ internal object ClothesCutoutTrimmer {
             (bottom + 1 + padding).coerceAtMost(height),
         )
     }
+}
+
+// 서버 옷 이미지는 투명 여백이 제각각이라 스티커로 불러올 때도 같은 기준으로 잘라 냄
+internal object ClothesTrimTransformation : Transformation() {
+    override val cacheKey: String = "ClothesTrimTransformation"
+
+    override suspend fun transform(input: Bitmap, size: Size): Bitmap = ClothesCutoutTrimmer.trim(input)
 }

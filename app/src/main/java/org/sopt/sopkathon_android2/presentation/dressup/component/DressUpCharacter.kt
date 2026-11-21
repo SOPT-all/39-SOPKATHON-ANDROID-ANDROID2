@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
+import coil3.request.transformations
 import coil3.size.Size
 import org.sopt.sopkathon_android2.R
 import org.sopt.sopkathon_android2.core.designsystem.component.Sticker
@@ -34,6 +35,7 @@ import org.sopt.sopkathon_android2.core.designsystem.component.rememberStickerCa
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 import org.sopt.sopkathon_android2.presentation.dressup.DressUpUiState
 import org.sopt.sopkathon_android2.presentation.dressup.component.character.CharacterHead
+import org.sopt.sopkathon_android2.presentation.dressup.component.wardrobe.ClothesTrimTransformation
 import org.sopt.sopkathon_android2.presentation.dressup.model.ClothesCategory
 import org.sopt.sopkathon_android2.presentation.dressup.model.WornItemUiModel
 
@@ -97,7 +99,11 @@ private fun StickerCanvasScope.WornItemStickers(items: List<WornItemUiModel>) {
             Sticker(key = item.key, size = size, initialPosition = position) {
                 if (item.imageUri != null) {
                     AsyncImage(
-                        model = ImageRequest.Builder(context).data(item.imageUri).size(Size.ORIGINAL).build(),
+                        model = ImageRequest.Builder(context)
+                            .data(item.imageUri)
+                            .size(Size.ORIGINAL)
+                            .transformations(ClothesTrimTransformation)
+                            .build(),
                         contentDescription = item.displayName,
                         modifier = Modifier.fillMaxSize(),
                     )
