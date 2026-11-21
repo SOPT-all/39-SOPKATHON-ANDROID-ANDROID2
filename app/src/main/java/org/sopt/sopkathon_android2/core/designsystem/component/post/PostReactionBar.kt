@@ -53,7 +53,9 @@ fun PostReactionBar(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                painter = painterResource(R.drawable.ic_feed_heart_24),
+                painter = painterResource(
+                    if (isLiked) R.drawable.ic_feed_heart_filled_24 else R.drawable.ic_feed_heart_24,
+                ),
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
                 tint = SopkathonTheme.colors.coolGray950,
@@ -133,6 +135,21 @@ private fun PostReactionBarPreview() {
             likeCount = 18,
             commentCount = 3,
             isLiked = false,
+            onLikeClick = {},
+            onCommentClick = {},
+            onShareClick = {},
+        )
+    }
+}
+
+@Preview(name = "좋아요 선택됨", showBackground = true, widthDp = 328)
+@Composable
+private fun PostReactionBarLikedPreview() {
+    SopkathonTheme {
+        PostReactionBar(
+            likeCount = 19,
+            commentCount = 3,
+            isLiked = true,
             onLikeClick = {},
             onCommentClick = {},
             onShareClick = {},
