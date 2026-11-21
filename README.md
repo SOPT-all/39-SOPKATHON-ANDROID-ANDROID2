@@ -19,7 +19,7 @@
 | 박찬미 | 공승준 | 신한서 | 정소연 |
 | :---: | :---: | :---: | :---: |
 | <img src="" width="160" /> | <img src="" width="160" /> | <img src="" width="160" /> | <img src="" width="160" /> |
-| [@chanmi1125](https://github.com/chanmi1125) | [@github-id]() | [@github-id]() | [@github-id]() |
+| [@chanmi1125](https://github.com/chanmi1125) | [@seungjunGong](https://github.com/seungjunGong) | [@shinhanseo](https://github.com/shinhanseo) | [@cowkite12](https://github.com/cowkite12) |
 | 피드<br>동료 선택<br>프로필 검색<br>아이콘 삽입 | 옷 입히기<br>게시글 업로드<br>옷 드래그 + 줌인/줌아웃 | 프로필 생성<br>게시글 상세 + 바텀시트<br>이미지 누끼 | 내 프로필<br>동료 프로필<br>디자인 시스템 |
 
 <br>
