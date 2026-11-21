@@ -25,6 +25,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.ColorImage
 import coil3.annotation.ExperimentalCoilApi
 import coil3.compose.AsyncImagePreviewHandler
@@ -42,6 +44,37 @@ private val DragThreshold = 24.dp
 
 @Composable
 fun WardrobeDrawer(
+    selectedKeys: Set<String>,
+    onClothesClick: (WardrobeClothes) -> Unit,
+    onClothesAdd: (WardrobeClothes) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: WardrobeViewModel = viewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    WardrobeDrawerContent(
+        uiState = uiState,
+        selectedKeys = selectedKeys,
+        onCategoryChange = viewModel::onCategoryChange,
+        onExpandedChange = viewModel::onExpandedChange,
+        onAddClick = viewModel::onAddClick,
+        onClothesClick = onClothesClick,
+        modifier = modifier,
+    )
+
+    if (uiState.isAddSheetVisible) {
+        AddClothesBottomSheet(
+            onClothesAdd = { clothes ->
+                viewModel.onClothesAdd(clothes)
+                onClothesAdd(clothes)
+            },
+            onDismiss = viewModel::onAddSheetDismiss,
+        )
+    }
+}
+
+@Composable
+internal fun WardrobeDrawerContent(
     uiState: WardrobeUiState,
     selectedKeys: Set<String>,
     onCategoryChange: (WardrobeCategory) -> Unit,
@@ -123,7 +156,7 @@ internal fun WardrobePreviewTheme(content: @Composable () -> Unit) {
 @Composable
 private fun WardrobeDrawerCollapsedPreview() {
     WardrobePreviewTheme {
-        WardrobeDrawer(
+        WardrobeDrawerContent(
             uiState = WardrobeUiState.dummy,
             selectedKeys = setOf(WardrobeUiState.dummy.tops.first().key),
             onCategoryChange = {},
@@ -139,7 +172,7 @@ private fun WardrobeDrawerCollapsedPreview() {
 @Composable
 private fun WardrobeDrawerExpandedPreview() {
     WardrobePreviewTheme {
-        WardrobeDrawer(
+        WardrobeDrawerContent(
             uiState = WardrobeUiState.dummy.copy(category = WardrobeCategory.BOTTOM, isExpanded = true),
             selectedKeys = setOf(WardrobeUiState.dummy.bottoms.first().key),
             onCategoryChange = {},

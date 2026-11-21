@@ -5,6 +5,7 @@ import org.sopt.sopkathon_android2.data.dto.response.ClothesListResponseDto
 data class WardrobeUiState(
     val category: WardrobeCategory = WardrobeCategory.TOP,
     val isExpanded: Boolean = false,
+    val isAddSheetVisible: Boolean = false,
     val tops: List<WardrobeClothes> = emptyList(),
     val bottoms: List<WardrobeClothes> = emptyList(),
 ) {
