@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -130,7 +129,7 @@ private fun ProfileCreateSelectBottomSheet(
             )
         },
     ) {
-        Column(modifier = Modifier.navigationBarsPadding().padding(bottom = 16.dp)) {
+        Column(modifier = Modifier.padding(bottom = 16.dp)) {
             Text(
                 text = title,
                 style = SopkathonTheme.typography.subtitle,

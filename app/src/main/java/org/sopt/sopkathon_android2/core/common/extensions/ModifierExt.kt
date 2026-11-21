@@ -4,14 +4,24 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.focus.FocusEventModifierNode
 import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -38,6 +48,25 @@ fun Modifier.clearFocusOnTap(): Modifier = composed {
     pointerInput(focusManager) {
         detectTapGestures { focusManager.clearFocus() }
     }
+}
+
+/**
+ * 안쪽에 포커스가 있는 동안 이 영역 전체를 스크롤 영역 안에 보이게 하는 함수
+ *
+ * 텍스트 필드 기본 동작은 커서 줄만 보여서, 키보드가 올라오면 입력칸 아래와 helper 문구가 잘림
+ * 키보드 높이가 바뀔 때마다 다시 맞춤. 스크롤 영역 안 입력칸의 가장 바깥 레이아웃에 사용
+ */
+fun Modifier.bringIntoViewOnFocus(): Modifier = composed {
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+    var hasFocus by remember { mutableStateOf(false) }
+    val imeBottom = WindowInsets.ime.getBottom(LocalDensity.current)
+
+    LaunchedEffect(hasFocus, imeBottom) {
+        if (hasFocus && imeBottom > 0) bringIntoViewRequester.bringIntoView()
+    }
+
+    bringIntoViewRequester(bringIntoViewRequester)
+        .onFocusChanged { hasFocus = it.hasFocus }
 }
 
 /**
