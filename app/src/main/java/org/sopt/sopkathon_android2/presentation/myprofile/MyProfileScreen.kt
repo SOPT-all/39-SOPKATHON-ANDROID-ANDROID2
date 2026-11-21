@@ -29,7 +29,7 @@ import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 import org.sopt.sopkathon_android2.presentation.myprofile.component.MyProfileAppBar
 import org.sopt.sopkathon_android2.presentation.myprofile.component.MyProfileEditButton
-import org.sopt.sopkathon_android2.presentation.myprofile.component.MyProfileHeader
+import org.sopt.sopkathon_android2.core.designsystem.component.profile.ProfileHeader
 import org.sopt.sopkathon_android2.presentation.myprofile.model.MyProfileOutfitUiModel
 
 // 3 내 프로필
@@ -84,7 +84,7 @@ private fun MyProfileScreen(
         ) {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Column(modifier = Modifier.padding(bottom = 24.dp)) {
-                    MyProfileHeader(
+                    ProfileHeader(
                         name = uiState.name,
                         rank = uiState.rank,
                         department = uiState.department,

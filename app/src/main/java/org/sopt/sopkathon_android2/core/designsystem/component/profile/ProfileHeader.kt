@@ -1,4 +1,4 @@
-package org.sopt.sopkathon_android2.presentation.myprofile.component
+package org.sopt.sopkathon_android2.core.designsystem.component.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,8 +17,9 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 
+// 내 프로필, 동료 프로필 공용
 @Composable
-fun MyProfileHeader(
+fun ProfileHeader(
     name: String,
     rank: String,
     department: String,
