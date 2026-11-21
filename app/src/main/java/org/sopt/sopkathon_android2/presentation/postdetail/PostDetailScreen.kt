@@ -81,7 +81,7 @@ fun PostDetailRoute(
     Box(modifier) {
         PostDetailScreen(
             uiState, navigateUp, onColleagueClick, viewModel::toggleLike, viewModel::openComments,
-            viewModel::selectTag, viewModel::openItem, openShop, share, viewModel::retry,
+            viewModel::selectTag, viewModel::openItem, share, viewModel::retry,
         )
         if (uiState.sheet == null) SopkathonSnackbarHost(Modifier.align(Alignment.TopCenter).padding(top = 56.dp))
     }
@@ -128,7 +128,6 @@ private fun PostDetailScreen(
     onCommentsClick: () -> Unit,
     onTagClick: (OutfitItemType) -> Unit,
     onItemClick: (Long) -> Unit,
-    onShopClick: (String) -> Unit,
     onShareClick: () -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
@@ -185,11 +184,6 @@ private fun PostDetailScreen(
                             )
                         }
                     }
-                    detail.purchaseUrls.forEachIndexed { index, url ->
-                        TextButton(onClick = { onShopClick(url) }) {
-                            Text("구매 링크 ${index + 1} ↗", color = SopkathonTheme.colors.coolGray950)
-                        }
-                    }
                     Text(
                         "댓글 ${post.commentCount}개 모두 보기",
                         style = SopkathonTheme.typography.bodySmall,
@@ -232,10 +226,29 @@ private fun DetailImage(
                             .noRippleClickable { onItemClick(item.clothesId) }.padding(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        AsyncImage(item.imageUrl, null, Modifier.size(28.dp), contentScale = ContentScale.Fit)
+                        AsyncImage(
+                            model = item.imageUrl,
+                            contentDescription = item.name,
+                            modifier = Modifier.size(32.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(SopkathonTheme.colors.coolGray50),
+                            contentScale = ContentScale.Fit,
+                        )
                         Spacer(Modifier.width(6.dp))
-                        Text(item.name, style = SopkathonTheme.typography.caption, color = SopkathonTheme.colors.coolGray950,
-                            maxLines = 2, overflow = TextOverflow.Ellipsis)
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "${item.brand} ↗",
+                                style = SopkathonTheme.typography.caption,
+                                color = SopkathonTheme.colors.coolGray500,
+                            )
+                            Text(
+                                text = item.name,
+                                style = SopkathonTheme.typography.caption,
+                                color = SopkathonTheme.colors.coolGray950,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
                     }
                 }
             }
@@ -252,7 +265,7 @@ private fun PostDetailScreenPreview() {
                 OutfitItemUiModel(1, "네이비 크루넥 니트", "상의", "", "https://example.com", OutfitItemType.TOP),
                 OutfitItemUiModel(2, "아이보리 데님", "하의", "", null, OutfitItemType.BOTTOM),
             ), emptyList())),
-            {}, {}, {}, {}, {}, {}, {}, {}, {},
+            {}, {}, {}, {}, {}, {}, {}, {},
         )
     }
 }

@@ -19,7 +19,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 
 class PostDetailApiTest {
     @Test
-    fun mapsKnownItemCategoriesWithoutInventingUnknownMarker() {
+    fun usesFixedProductsWhileKeepingPostResponse() {
         val dto = Json { ignoreUnknownKeys = true }.decodeFromString<PostDetailResponseDto>("""{
             "postId":501,"author":{"userId":2,"name":"작성자","position":"대리"},
             "targetUser":{"userId":1,"name":"대상자","position":"과장"},
@@ -33,8 +33,9 @@ class PostDetailApiTest {
         assertTrue(model.post.isLiked)
         assertEquals("", model.post.content)
         assertNotNull(model.items.first().type)
-        assertNull(model.items.last().type)
-        assertNull(model.items.last().purchaseUrl)
+        assertEquals("UNIQLO", model.items.first().brand)
+        assertEquals("H&M", model.items.last().brand)
+        assertEquals("39,900원", model.items.last().priceLabel)
         assertEquals(listOf("https://example.com"), model.purchaseUrls)
         assertNull("https:///missing-host".toWebUrlOrNull())
     }

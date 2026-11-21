@@ -14,6 +14,7 @@ import coil3.compose.AsyncImage
 import org.sopt.sopkathon_android2.core.common.extensions.noRippleClickable
 import org.sopt.sopkathon_android2.core.designsystem.component.SopkathonSnackbarHost
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
+import org.sopt.sopkathon_android2.presentation.postdetail.model.DummyPostOutfitItems
 import org.sopt.sopkathon_android2.presentation.postdetail.model.OutfitItemUiModel
 
 @Composable
@@ -34,17 +35,29 @@ fun PostItemSheet(
                     .background(SopkathonTheme.colors.coolGray50),
             )
             Spacer(Modifier.width(16.dp))
-            Text(item.name, style = SopkathonTheme.typography.itemName, color = SopkathonTheme.colors.coolGray950)
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(item.brand, style = SopkathonTheme.typography.caption, color = SopkathonTheme.colors.coolGray500)
+                Text(item.name, style = SopkathonTheme.typography.itemName, color = SopkathonTheme.colors.coolGray950)
+                Text(item.priceLabel, style = SopkathonTheme.typography.bodySmall, color = SopkathonTheme.colors.coolGray950)
+            }
         }
         Spacer(Modifier.height(20.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth().background(
-                SopkathonTheme.colors.coolGray50, RoundedCornerShape(16.dp),
-            ).padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(SopkathonTheme.colors.coolGray50, RoundedCornerShape(16.dp))
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Text("카테고리", style = SopkathonTheme.typography.caption, color = SopkathonTheme.colors.coolGray500)
-            Text(item.category, style = SopkathonTheme.typography.bodySmall, color = SopkathonTheme.colors.coolGray950)
+            (listOf("카테고리" to item.category) + item.attributes).forEach { (label, value) ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(label, style = SopkathonTheme.typography.caption, color = SopkathonTheme.colors.coolGray500)
+                    Text(value, style = SopkathonTheme.typography.bodySmall, color = SopkathonTheme.colors.coolGray950)
+                }
+            }
         }
         Spacer(Modifier.height(24.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -80,6 +93,6 @@ internal fun SheetAction(
 @Composable
 private fun PostItemSheetPreview() {
     SopkathonTheme {
-        PostItemSheet(OutfitItemUiModel(1, "네이비 크루넥 니트", "상의", "", "https://example.com", null), {}, {})
+        PostItemSheet(DummyPostOutfitItems.items.first(), {}, {})
     }
 }

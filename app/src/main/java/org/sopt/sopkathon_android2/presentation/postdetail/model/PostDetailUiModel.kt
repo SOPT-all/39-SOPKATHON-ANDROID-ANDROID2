@@ -6,6 +6,7 @@ import org.sopt.sopkathon_android2.data.dto.response.FeedPostResponseDto
 import org.sopt.sopkathon_android2.data.dto.response.PostDetailResponseDto
 import org.sopt.sopkathon_android2.presentation.feed.model.FeedPostUiModel
 import org.sopt.sopkathon_android2.presentation.feed.model.toUiModel
+import org.sopt.sopkathon_android2.data.mapper.normalizePostTimestamp
 import java.net.URI
 import java.util.Locale
 
@@ -16,6 +17,9 @@ data class OutfitItemUiModel(
     val imageUrl: String,
     val purchaseUrl: String?,
     val type: OutfitItemType?,
+    val brand: String = "",
+    val priceLabel: String = "",
+    val attributes: List<Pair<String, String>> = emptyList(),
 )
 
 data class CommentUiModel(
@@ -40,28 +44,12 @@ fun PostDetailResponseDto.toUiModel() = PostDetailUiModel(
         likeCount, liked, commentCount, createdAt,
     ).toUiModel(),
     targetUserId = targetUser.userId,
-    items = outfitItems.distinctBy { it.clothesId }.map { item ->
-        OutfitItemUiModel(
-            item.clothesId, item.name,
-            when (item.category.trim().uppercase(Locale.ROOT)) {
-                "TOP" -> "상의"
-                "BOTTOM" -> "하의"
-                else -> item.category
-            },
-            item.imageUrl.orEmpty(),
-            item.purchaseUrl.toWebUrlOrNull(),
-            when (item.category.trim().uppercase(Locale.ROOT)) {
-                "TOP", "상의" -> OutfitItemType.TOP
-                "BOTTOM", "하의" -> OutfitItemType.BOTTOM
-                else -> null
-            },
-        )
-    },
+    items = DummyPostOutfitItems.items,
     purchaseUrls = purchaseLinks.mapNotNull { it.url.toWebUrlOrNull() }.distinct(),
 )
 
 fun CommentResponseDto.toUiModel() = CommentUiModel(
-    commentId, author.userId, author.name.trim(), author.position.trim(), content, createdAt,
+    commentId, author.userId, author.name.trim(), author.position.trim(), content, createdAt.normalizePostTimestamp(),
 )
 
 fun String?.toWebUrlOrNull(): String? = this?.trim()?.takeIf { value ->
