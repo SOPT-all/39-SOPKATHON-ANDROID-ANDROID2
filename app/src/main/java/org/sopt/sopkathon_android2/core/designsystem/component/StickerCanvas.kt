@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -281,6 +282,8 @@ private fun StickerSelection(
     Box(
         modifier = Modifier
             .offset { IntOffset(frame.left.roundToInt(), frame.top.roundToInt()) }
+            // 캔버스 폭만큼 넓은 스티커는 테두리가 캔버스보다 커서 부모 크기에 맞춰 줄어드는 것 방지
+            .wrapContentSize(Alignment.TopStart, unbounded = true)
             .size(frameSize)
             .drawBehind {
                 val strokeWidth = SelectionStrokeWidth.toPx()
