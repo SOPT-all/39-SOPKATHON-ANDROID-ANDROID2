@@ -76,7 +76,7 @@ fun MainNavHost(
         composable<Feed> {
             FeedRoute(
                 // 프로필 생성 API 연동 전 백엔드 테스트 사용자 ID
-                userId = 1L,
+                userId = 3L,
                 onColleagueClick = navController::navigateToColleagueProfile,
                 onPostClick = navController::navigateToPostDetail,
                 modifier = screenModifier,
@@ -143,10 +143,11 @@ fun MainNavHost(
         composable<PostDetail> { backStackEntry ->
             val postDetail = backStackEntry.toRoute<PostDetail>()
             PostDetailRoute(
+                userId = 3L,
                 postId = postDetail.postId,
                 navigateUp = navController::navigateUp,
                 onColleagueClick = navController::navigateToColleagueProfile,
-                onDressUpClick = navController::navigateToColleagueSelect,
+                onDressUpClick = navController::navigateToDressUp,
                 modifier = screenModifier,
             )
         }
