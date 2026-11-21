@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.material3.MaterialTheme
+import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
 
 @Composable
 fun HomeRoute(
@@ -41,7 +41,7 @@ private fun HomeScreen(
 @Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
-    MaterialTheme {
+    SopkathonTheme {
         HomeScreen(uiState = HomeUiState(title = "Home"))
     }
 }
