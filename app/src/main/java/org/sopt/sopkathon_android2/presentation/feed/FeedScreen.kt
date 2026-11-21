@@ -1,20 +1,31 @@
 package org.sopt.sopkathon_android2.presentation.feed
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import org.sopt.sopkathon_android2.core.common.extensions.toast
 import org.sopt.sopkathon_android2.core.designsystem.preview.ScreenPreview
 import org.sopt.sopkathon_android2.core.designsystem.theme.SopkathonTheme
+import org.sopt.sopkathon_android2.presentation.feed.component.FeedHeader
+import org.sopt.sopkathon_android2.presentation.feed.component.FeedPostSection
+import org.sopt.sopkathon_android2.presentation.feed.component.FeedScope
+import org.sopt.sopkathon_android2.presentation.feed.component.FeedScopeTabs
+import org.sopt.sopkathon_android2.presentation.feed.component.FeedTeamLookBanner
 
-// 1 피드
 @Composable
 fun FeedRoute(
     onColleagueClick: (Long) -> Unit,
@@ -23,11 +34,18 @@ fun FeedRoute(
     viewModel: FeedViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     FeedScreen(
         uiState = uiState,
+        onScopeClick = viewModel::selectScope,
+        onLikeClick = viewModel::toggleLike,
         onColleagueClick = onColleagueClick,
         onPostClick = onPostClick,
+        onNotificationClick = { context.toast("알림 기능은 준비 중이에요") },
+        onTeamLookClick = { context.toast("팀룩 기능은 준비 중이에요") },
+        onMoreClick = { context.toast("더보기 기능은 준비 중이에요") },
+        onShareClick = { context.toast("공유 기능은 준비 중이에요") },
         modifier = modifier,
     )
 }
@@ -35,23 +53,66 @@ fun FeedRoute(
 @Composable
 private fun FeedScreen(
     uiState: FeedUiState,
+    onScopeClick: (FeedScope) -> Unit,
+    onLikeClick: (Long) -> Unit,
     onColleagueClick: (Long) -> Unit,
     onPostClick: (Long) -> Unit,
+    onNotificationClick: () -> Unit,
+    onTeamLookClick: () -> Unit,
+    onMoreClick: () -> Unit,
+    onShareClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .fillMaxSize()
+            .background(SopkathonTheme.colors.white),
     ) {
-        Text(text = uiState.title)
-
-        // 네비게이션 확인용 임시 버튼, 화면 구현 시 교체
-        TextButton(onClick = { onColleagueClick(1L) }) {
-            Text(text = "동료 프로필")
-        }
-        TextButton(onClick = { onPostClick(1L) }) {
-            Text(text = "게시물 상세")
+        FeedHeader(onNotificationClick = onNotificationClick)
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+            contentPadding = PaddingValues(bottom = 24.dp),
+        ) {
+            item(key = "scope") {
+                FeedScopeTabs(
+                    selectedScope = uiState.selectedScope,
+                    onScopeClick = onScopeClick,
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 12.dp),
+                )
+            }
+            item(key = "teamLook") {
+                FeedTeamLookBanner(
+                    title = "금요일 회식룩을 골라 주세요",
+                    deadlineLabel = "D-2",
+                    participationText = "마케팅팀 12명 중 5명 참여",
+                    onClick = onTeamLookClick,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+            items(
+                items = uiState.posts,
+                key = { it.postId },
+            ) { post ->
+                FeedPostSection(
+                    post = post,
+                    onAuthorClick = { onColleagueClick(post.author.userId) },
+                    onPostClick = { onPostClick(post.postId) },
+                    onLikeClick = { onLikeClick(post.postId) },
+                    onCommentClick = { onPostClick(post.postId) },
+                    onMoreClick = onMoreClick,
+                    onShareClick = onShareClick,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp)
+                        .background(SopkathonTheme.colors.coolGray50),
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+            }
         }
     }
 }
@@ -61,9 +122,15 @@ private fun FeedScreen(
 private fun FeedScreenPreview() {
     SopkathonTheme {
         FeedScreen(
-            uiState = FeedUiState(title = "Feed"),
+            uiState = FeedUiState.dummy,
+            onScopeClick = {},
+            onLikeClick = {},
             onColleagueClick = {},
             onPostClick = {},
+            onNotificationClick = {},
+            onTeamLookClick = {},
+            onMoreClick = {},
+            onShareClick = {},
         )
     }
 }
