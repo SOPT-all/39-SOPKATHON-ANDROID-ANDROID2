@@ -4,7 +4,7 @@
 
 | Step | File | Add |
 | --- | --- | --- |
-| 1 | `presentation/<screen>/` | `XxxContract.kt`, `XxxScreen.kt`, `XxxViewModel.kt` (copy `home`) |
+| 1 | `presentation/<screen>/` | `XxxContract.kt`, `XxxScreen.kt`, `XxxViewModel.kt` + `component/` (copy `feed`) |
 | 2 | `MainRoute.kt` | `@Serializable data object Xxx : Route` (with args: `data class Xxx(val id: Long) : Route`) |
 | 3 | `MainNavigator.kt` | `fun NavController.navigateToXxx() { navigate(Xxx) }` |
 | 4 | `MainNavHost.kt` | `composable<Xxx> { XxxRoute(...) }` |

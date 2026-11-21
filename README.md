@@ -66,8 +66,17 @@ org.sopt.sopkathon_android2
 │   ├── dto           # request, response
 │   └── service
 └── presentation
-    ├── main          # MainActivity, MainScreen, navigation
-    └── home          # component, model, Contract, Screen, ViewModel
+    ├── main              # MainActivity, MainScreen, MainBottomBar, navigation
+    ├── consent           # 0.2 사진 사용 동의
+    ├── profilecreate     # 0.3 프로필 생성
+    ├── feed              # 1 피드
+    ├── colleagueselect   # 2.1 동료 선택
+    ├── dressup           # 2.2 옷 입히기
+    ├── upload            # 2.3 게시글 업로드
+    ├── myprofile         # 3 내 프로필
+    ├── colleagueprofile  # 4 동료 프로필
+    ├── postdetail        # 5 게시물 상세 (+ 댓글 바텀시트)
+    └── search            # 6 검색
 ```
 
 <br>
